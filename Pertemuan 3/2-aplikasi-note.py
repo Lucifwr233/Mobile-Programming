@@ -20,11 +20,19 @@ def main (page : Page):
     #menampilkan objek
     judul_aplikasi = "Aplikasi Note"
     page.add(
-            Text(judul_aplikasi, 
+        Row(
+                controls = [
+                Text(judul_aplikasi, 
                 size = 30,
                 weight= "bold",
+                color = "white"   
             )
-        )
+        ],
+        alignment=MainAxisAlignment.CENTER
+
+    )
+
+)
 
 #mengatur output aplikasi
 flet.app(target = main)
