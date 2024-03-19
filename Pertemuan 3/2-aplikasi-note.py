@@ -10,6 +10,11 @@ class FormCatatan(UserControl) :
             hint_text= "masukkan catatan kamu .... ",
             expand=True
         )
+
+        #buat variabel untuk layout data tampil
+        catatan.layout_data = Column()
+
+
         return Column(
             controls= [
             Row(
@@ -23,6 +28,8 @@ class FormCatatan(UserControl) :
                     )
                 ]
             ),
+            #menampilkan layout catatan ke dalam column
+            catatan.layout_data
         ]
         )
 
