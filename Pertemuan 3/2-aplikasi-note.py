@@ -50,6 +50,18 @@ class FormCatatan(UserControl) :
         catatan.tampil_ubahdata.visible = True
         catatan.update()
 
+class FormDataCatatan(UserControl) :
+    def __init__(catatan, isi_catatan, hapus_catatan):
+        super().__init__()
+        catatan.isi_catatan = isi_catatan
+        catatan.hapus_catatan = hapus_catatan
+
+    def build(catatan):
+        #buat variabel untuk checkbox
+        catatan.isi_catatan = Checkbox(value= False, label = catatan.isi_catatan)
+        #buat variabel inputan hapus
+        catatan.hapus_catatan
+
 #function/fungsi utama
 def main (page : Page):
 
