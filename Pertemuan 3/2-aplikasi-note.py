@@ -18,15 +18,21 @@ def main (page : Page):
     page.scroll = "adaptive"
 
     #menampilkan objek
-    judul_aplikasi = "Aplikasi Note"
+    judul_aplikasi_1 = "Aplikasi"
+    judul_aplikasi_2 = "Note"
     page.add(
         Row(
-                controls = [
-                Text(judul_aplikasi, 
+            controls = [
+                Text(judul_aplikasi_1, 
+                size = 30,
+                weight= "bold",
+                color = "grey"   
+            ),
+                Text(judul_aplikasi_2, 
                 size = 30,
                 weight= "bold",
                 color = "white"   
-            )
+            ),
         ],
         alignment=MainAxisAlignment.CENTER
 
