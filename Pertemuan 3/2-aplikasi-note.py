@@ -57,10 +57,30 @@ class FormDataCatatan(UserControl) :
         catatan.hapus_catatan = hapus_catatan
 
     def build(catatan):
-        #buat variabel untuk checkbox
-        catatan.isi_catatan = Checkbox(value= False, label = catatan.isi_catatan)
-        #buat variabel inputan hapus
-        catatan.hapus_catatan
+        catatan.data_catatan = Checkbox(value=False, label=catatan.isi_catatan)
+
+        catatan.tampil_data = Row(
+            alignment="spaceBetween",
+            VerticalAlignment="center",
+            controls=[
+                catatan.data_catatan,
+                Row(
+                    spacing=0,
+                    controls=[
+                        IconButton(
+                            icon=icons.CREATE_OUTLINED,
+                            tooltip = "ubah",
+                        ),
+                        IconButton(
+                            icons.DELETE_OUTLINE,
+                            tooltip = "hapus",
+                        ),
+                    ],
+                ),
+            ],
+        )
+
+        return Column(controls=[catatan.tampil_data])
 
 #function/fungsi utama
 def main (page : Page):
