@@ -41,10 +41,15 @@ class FormCatatan(UserControl) :
                 controls= [
                     #field / inputan catatan
                     catatan.inputan_catatan_baru3,
+                ]
+            ),
+            Row(
+                controls= [
                     #tombol tambah data
                     FloatingActionButton(
                         icon= icons.ADD,
-                        bgcolor= "purple",
+                        text=("Tambah Data"),
+                        bgcolor= "blue",
                         on_click=catatan.tambah_catatan
                     )
                 ]
@@ -70,6 +75,8 @@ class FormCatatan(UserControl) :
         catatan.layout_data_controls.remove(data_catatan_masuk)
         catatan.update()
 
+
+
 # membuat class form data rekapan
 class FormDataCatatan(UserControl) :
         def __init__(catatan, isi_catatan, hapus_catatan):
@@ -80,6 +87,10 @@ class FormDataCatatan(UserControl) :
         def build(catatan):
             catatan.data_catatan = Checkbox(value=False, label=catatan.isi_catatan)
 
+            #buat variabel untuk inputan ubah data
+            catatan.inputan_catatan_ubah = TextField(expand=True)
+
+            #form untuk tampil data
             catatan.tampil_data = Row(
                 alignment="spaceBetween",
                 vertical_alignment="center",
@@ -91,17 +102,56 @@ class FormDataCatatan(UserControl) :
                             IconButton(
                                 icon=icons.CREATE_OUTLINED,
                                 tooltip = "ubah",
+                                on_click= catatan.ubah_data,
                             ),
                             IconButton(
                                 icons.DELETE_OUTLINE,
                                 tooltip = "hapus",
+                                on_click= catatan.hapus_data,
                             ),
                         ]
                     )
                 ]
             )
 
-            return Column(controls=[catatan.tampil_data])
+            #form untuk tampil ubah data
+            catatan.tampil_ubah_data = Row(
+                alignment="spaceBetween",
+                vertical_alignment="center",
+                controls=[
+                    catatan.inputan_catatan_ubah,
+                    Row(
+                        spacing=0,
+                        controls=[
+                            IconButton(
+                                icon=icons.DONE_OUTLINED,
+                                tooltip = "Simpan Perubahan",
+                                on_click = catatan.simpan_ubah_data,
+                            ),
+                        ]
+                    )
+                ]
+            )
+            return Column(controls=[catatan.tampil_data, catatan.tampil_ubah_data])
+
+            #fungsi untuk perintah simpan data
+        def simpan_ubah_data(catatan, e):
+            catatan.data_catatan.label = catatan.inputan_catatan_ubah.value
+            catatan.tampil_data.visible = True
+            catatan.tampil_ubah_data.visible = False
+            catatan.update()
+
+            #fungsi untuk ubah form data update
+        def ubah_data(catatan, e):
+            catatan.inputan_catatan_ubah.value = catatan.data_catatan.label
+            catatan.tampil_data.visible = False
+            catatan.tampil_ubah_data.visible = True
+            catatan.update()
+
+            #fungsi untk hapus data
+        def hapus_data(catatan, e):
+            catatan.hapus_catatan(catatan)
+            catatan.update()
 
 #function/fungsi utama
 def main (page : Page):
