@@ -72,7 +72,7 @@ class FormCatatan(UserControl) :
 
     #fungsi perintah hapus data
     def hapus_catatan (catatan, data_catatan_masuk) :
-        catatan.layout_data_controls.remove(data_catatan_masuk)
+        catatan.layout_data.controls.remove(data_catatan_masuk)
         catatan.update()
 
 
@@ -116,6 +116,7 @@ class FormDataCatatan(UserControl) :
 
             #form untuk tampil ubah data
             catatan.tampil_ubah_data = Row(
+                visible = False,
                 alignment="spaceBetween",
                 vertical_alignment="center",
                 controls=[
@@ -151,7 +152,7 @@ class FormDataCatatan(UserControl) :
             #fungsi untk hapus data
         def hapus_data(catatan, e):
             catatan.hapus_catatan(catatan)
-            catatan.update()
+            
 
 #function/fungsi utama
 def main (page : Page):
