@@ -14,6 +14,10 @@ class FormCatatan(UserControl) :
             hint_text= "Text 2 ",
             expand=True
         )
+        catatan.inputan_catatan_baru3= TextField(
+            hint_text= "Text 3 ",
+            expand=True
+        )
 
         #buat variabel untuk layout data tampil
         catatan.layout_data = Column()
@@ -25,8 +29,18 @@ class FormCatatan(UserControl) :
                 controls= [
                     #field / inputan catatan
                     catatan.inputan_catatan_baru,
-
+                ]
+            ),
+            Row(
+                controls= [
+                    #field / inputan catatan
                     catatan.inputan_catatan_baru2,
+                ]
+            ),
+            Row(
+                controls= [
+                    #field / inputan catatan
+                    catatan.inputan_catatan_baru3,
                     #tombol tambah data
                     FloatingActionButton(
                         icon= icons.ADD,
@@ -42,12 +56,13 @@ class FormCatatan(UserControl) :
 
     #fungsi perintah tambah data
     def tambah_catatan (catatan, e) :
-        data_catatan_baru = FormDataCatatan(catatan.inputan_catatan_baru.value+catatan.inputan_catatan_baru2.value, catatan.hapus_catatan)
+        data_catatan_baru = FormDataCatatan(catatan.inputan_catatan_baru.value+catatan.inputan_catatan_baru2.value+catatan.inputan_catatan_baru3.value, catatan.hapus_catatan)
         catatan.layout_data.controls.append(data_catatan_baru)
 
 
         catatan.inputan_catatan_baru.value = ""
         catatan.inputan_catatan_baru2.value = ""
+        catatan.inputan_catatan_baru3.value = ""
         catatan.update()
 
     #fungsi perintah hapus data
