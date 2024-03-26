@@ -7,7 +7,11 @@ class FormCatatan(UserControl) :
     def build(catatan):
         #buat variabel untk inputan catatan
         catatan.inputan_catatan_baru= TextField(
-            hint_text= "masukkan catatan kamu .... ",
+            hint_text= "Text 1 ",
+            expand=True
+        )
+        catatan.inputan_catatan_baru2= TextField(
+            hint_text= "Text 2 ",
             expand=True
         )
 
@@ -21,6 +25,8 @@ class FormCatatan(UserControl) :
                 controls= [
                     #field / inputan catatan
                     catatan.inputan_catatan_baru,
+
+                    catatan.inputan_catatan_baru2,
                     #tombol tambah data
                     FloatingActionButton(
                         icon= icons.ADD,
@@ -36,10 +42,12 @@ class FormCatatan(UserControl) :
 
     #fungsi perintah tambah data
     def tambah_catatan (catatan, e) :
-        data_catatan_baru = FormDataCatatan(catatan.inputan_catatan_baru.value, catatan.hapus_catatan)
+        data_catatan_baru = FormDataCatatan(catatan.inputan_catatan_baru.value+catatan.inputan_catatan_baru2.value, catatan.hapus_catatan)
         catatan.layout_data.controls.append(data_catatan_baru)
 
+
         catatan.inputan_catatan_baru.value = ""
+        catatan.inputan_catatan_baru2.value = ""
         catatan.update()
 
     #fungsi perintah hapus data
