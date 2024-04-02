@@ -11,18 +11,19 @@ class FormCatatan(UserControl) :
             catatan.inputan_tgl_baru.value = tgl_baru.date()
             catatan.update()
         def opsi_tanggal_dismissed(e):
-            tgl_baru = catatan.opsi_tanggal.value
-            catatan.inputan_tgl_baru.value = tgl_baru.date()
+            tgl_baru = catatan.inputan_tgl_baru.value
+            catatan.inputan_tgl_baru.value = tgl_baru
             catatan.update()
 
         # Buat variabel untuk inputan catatan
-        catatan.inputan_catatan_baru= TextField(
+        catatan.inputan_nama= TextField(
             hint_text= "Nama",
             label="Nama",
             expand=True
         )
         
         catatan.inputan_tgl_baru= TextField(
+            label="Tanggal Lahir",
             hint_text= "Tanggal Lahir ",
             expand=True,
             read_only=True
@@ -35,7 +36,7 @@ class FormCatatan(UserControl) :
             last_date=datetime.datetime(2024, 10, 1),
         )
 
-        catatan.dropdwon_jeniskelamin = Dropdown(
+        catatan.dropdown_jeniskelamin = Dropdown(
             width= 340,
             label="Jenis Kelamin",
             hint_text="Jenis Kelamin",
@@ -43,13 +44,21 @@ class FormCatatan(UserControl) :
                     dropdown.Option("Laki-Laki"),
                     dropdown.Option("Perempuan"),
                 ],
-            autofocus=True,
+            autofocus=False,
         )
 
         catatan.inputan_alamat= TextField(
             label="Alamat",
             hint_text= "Alamat",
             expand=True,
+        )
+
+        #variabel untuk snackbar
+        catatan.snackbar = SnackBar(
+            content= Text("Data tidak boleh kosong"),
+            bgcolor= colors.LIGHT_BLUE,
+            close_icon_color= colors.WHITE,
+            show_close_icon= True
         )
 
         # Buat variabel untuk layout data tampil
@@ -60,12 +69,12 @@ class FormCatatan(UserControl) :
             Row(
                 controls= [
                     # Inputan Nama
-                    catatan.inputan_catatan_baru,
+                    catatan.inputan_nama,
                 ]
             ),
             Row(
                 controls= [
-                    catatan.dropdwon_jeniskelamin
+                    catatan.dropdown_jeniskelamin
                 ]
             ),
             Row(
@@ -99,19 +108,25 @@ class FormCatatan(UserControl) :
                 ]
             ),
             # Menampilkan layout catatan ke dalam column
-            catatan.layout_data
+            catatan.layout_data,
+            catatan.snackbar
         ]
         )
 
     # Fungsi perintah tambah data
     def tambah_catatan (catatan, e) :
-        data_catatan_baru = FormDataCatatan(catatan.inputan_catatan_baru.value+catatan.inputan_catatan_baru2.value+catatan.inputan_catatan_baru3.value, catatan.hapus_catatan)
-        catatan.layout_data.controls.append(data_catatan_baru)
+        if catatan.inputan_nama.value == "" or catatan.dropdown_jeniskelamin == "" or catatan.inputan_tgl_baru or catatan.inputan_alamat :
+            catatan.snackbar.open = True
+            catatan.update()
 
-        catatan.inputan_catatan_baru.value = ""
-        catatan.inputan_catatan_baru2.value = ""
-        catatan.inputan_catatan_baru3.value = ""
-        catatan.update()
+        elif catatan.inputan_nama.value != "" or catatan.dropdown_jeniskelamin.value != "" or catatan.inputan_tgl_baru.value != "" or catatan.inputan_alamat != "" :
+            data_catatan_baru = FormCatatan(catatan.inputan_nama.value ,catatan.hapus_catatan)
+            catatan.layout_data.controls.append(data_catatan_baru)
+            catatan.inputan_nama.value = ""
+            catatan.dropdown_jeniskelamin.value = ""
+            catatan.inputan_tgl_baru.value = ""
+            catatan.inputan_alamat = ""
+            catatan.update()
 
     # Fungsi perintah hapus data
     def hapus_catatan (catatan, data_catatan_masuk) :
@@ -120,80 +135,82 @@ class FormCatatan(UserControl) :
 
 
 # Membuat class form data rekapan
-# class FormDataCatatan(UserControl) :
-#     def __init__(catatan, isi_catatan, hapus_catatan):
-#         super().__init__()
-#         catatan.isi_catatan = isi_catatan
-#         catatan.hapus_catatan = hapus_catatan
+class FormDataCatatan(UserControl) :
+    def __init__(catatan, nama_catatan, jk_catatan, hapus_catatan):
+        super().__init__()
+        catatan.nama_catatan = nama_catatan
+        catatan.jk_catatan = jk_catatan
+        catatan.hapus_catatan = hapus_catatan
 
-#     def build(catatan):
-#         catatan.data_catatan = Checkbox(value=False, label=catatan.isi_catatan)
+    def build(catatan):
+        # catatan.data_catatan = Checkbox(value=False, label=catatan.isi_catatan)
+        catatan.data_catatan = Text(catatan.isi_catatan)
 
-#         # Buat variabel untuk inputan ubah data
-#         catatan.inputan_catatan_ubah = TextField(expand=True)
+        # Buat variabel untuk inputan ubah data
+        catatan.inputan_catatan_ubah = TextField(expand=True)
 
-#         # Form untuk tampil data
-#         catatan.tampil_data = Row(
-#             alignment="spaceBetween",
-#             vertical_alignment="center",
-#             controls=[
-#                 catatan.data_catatan,
-#                 Row(
-#                     spacing=0,
-#                     controls=[
-#                         IconButton(
-#                             icon=icons.CREATE_OUTLINED,
-#                             tooltip="ubah",
-#                             on_click=catatan.ubah_data,
-#                         ),
-#                         IconButton(
-#                             icons.DELETE_OUTLINE,
-#                             tooltip="hapus",
-#                             on_click=catatan.hapus_data,
-#                         ),
-#                     ]
-#                 )
-#             ]
-#         )
+        # Form untuk tampil data
+        catatan.tampil_data = Row(
+            alignment="spaceBetween",
+            vertical_alignment="center",
+            controls=[
+                catatan.data_catatan,
+                Row(
+                    spacing=0,
+                    controls=[
+                        IconButton(
+                            icon=icons.CREATE_OUTLINED,
+                            tooltip="ubah",
+                            on_click=catatan.ubah_data,
+                        ),
+                        IconButton(
+                            icons.DELETE_OUTLINE,
+                            tooltip="hapus",
+                            on_click=catatan.hapus_data,
+                        ),
+                    ]
+                )
+            ]
+        )
 
-#         # Form untuk tampil ubah data
-#         catatan.tampil_ubah_data = Row(
-#             visible=False,
-#             alignment="spaceBetween",
-#             vertical_alignment="center",
-#             controls=[
-#                 catatan.inputan_catatan_ubah,
-#                 Row(
-#                     spacing=0,
-#                     controls=[
-#                         IconButton(
-#                             icon=icons.DONE_OUTLINED,
-#                             tooltip="Simpan Perubahan",
-#                             on_click=catatan.simpan_ubah_data,
-#                         ),
-#                     ]
-#                 )
-#             ]
-#         )
-#         return Column(controls=[catatan.tampil_data, catatan.tampil_ubah_data])
+        # Form untuk tampil ubah data
+        catatan.tampil_ubah_data = Row(
+            visible=False,
+            alignment="spaceBetween",
+            vertical_alignment="center",
+            controls=[
+                catatan.inputan_catatan_ubah,
+                Row(
+                    spacing=0,
+                    controls=[
+                        IconButton(
+                            icon=icons.DONE_OUTLINED,
+                            tooltip="Simpan Perubahan",
+                            on_click=catatan.simpan_ubah_data,
+                        ),
+                    ]
+                )
+            ]
+        )
+        return Column(controls=[catatan.tampil_data, catatan.tampil_ubah_data])
 
-#     # Fungsi untuk perintah simpan data
-#     def simpan_ubah_data(catatan, e):
-#         catatan.data_catatan.label = catatan.inputan_catatan_ubah.value
-#         catatan.tampil_data.visible = True
-#         catatan.tampil_ubah_data.visible = False
-#         catatan.update()
+    # Fungsi untuk perintah simpan data
+    def simpan_ubah_data(catatan, e):
+        catatan.data_catatan.label = catatan.inputan_catatan_ubah.value
+        catatan.tampil_data.visible = True
+        catatan.tampil_ubah_data.visible = False
+        catatan.update()
 
-#     # Fungsi untuk ubah form data update
-#     def ubah_data(catatan, e):
-#         catatan.inputan_catatan_ubah.value = catatan.data_catatan.label
-#         catatan.tampil_data.visible = False
-#         catatan.tampil_ubah_data.visible = True
-#         catatan.update()
+    # Fungsi untuk ubah form data update
+    def ubah_data(catatan, e):
+        catatan.inputan_catatan_ubah.value = catatan.data_catatan.label
+        catatan.tampil_data.visible = False
+        catatan.tampil_ubah_data.visible = True
+        catatan.update()
 
-#     # Fungsi untuk hapus data
-#     def hapus_data(catatan, e):
-#         catatan.hapus_catatan(catatan)
+    # Fungsi untuk hapus data
+    def hapus_data(catatan, e):
+        catatan.hapus_catatan(catatan)
 
 # Function/fungsi utama
 def main(page: Page):
