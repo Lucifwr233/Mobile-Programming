@@ -116,12 +116,12 @@ class FormCatatan(UserControl) :
 
     # Fungsi perintah tambah data
     def tambah_catatan (catatan, e) :
-        if catatan.inputan_nama.value == "" or catatan.dropdown_jeniskelamin == "" or catatan.inputan_tgl_baru or catatan.inputan_alamat :
+        if catatan.inputan_nama.value == "" or catatan.dropdown_jeniskelamin == "" or catatan.inputan_tgl_baru =="" or catatan.inputan_alamat =="" :
             catatan.snackbar.open = True
             catatan.update()
 
         elif catatan.inputan_nama.value != "" or catatan.dropdown_jeniskelamin.value != "" or catatan.inputan_tgl_baru.value != "" or catatan.inputan_alamat != "" :
-            data_catatan_baru = FormCatatan(catatan.inputan_nama.value ,catatan.hapus_catatan)
+            data_catatan_baru = FormDataCatatan(catatan.inputan_nama.value,catatan.dropdown_jeniskelamin.value ,catatan.hapus_catatan)
             catatan.layout_data.controls.append(data_catatan_baru)
             catatan.inputan_nama.value = ""
             catatan.dropdown_jeniskelamin.value = ""
@@ -145,7 +145,7 @@ class FormDataCatatan(UserControl) :
 
     def build(catatan):
         # catatan.data_catatan = Checkbox(value=False, label=catatan.isi_catatan)
-        catatan.data_catatan = Text(catatan.isi_catatan)
+        catatan.data_catatan = Text(catatan.nama_catatan + " (" + catatan.jk_catatan+ " )" )
 
         # Buat variabel untuk inputan ubah data
         catatan.inputan_catatan_ubah = TextField(expand=True)
