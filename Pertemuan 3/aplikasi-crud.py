@@ -21,6 +21,17 @@ class FormCatatan(UserControl) :
             label="Nama",
             expand=True
         )
+
+        catatan.dropdown_jeniskelamin = Dropdown(
+            width= 340,
+            label="Jenis Kelamin",
+            hint_text="Jenis Kelamin",
+                options=[
+                    dropdown.Option("Laki-Laki"),
+                    dropdown.Option("Perempuan"),
+                ],
+            autofocus=False,
+        )
         
         catatan.inputan_tgl_baru= TextField(
             label="Tanggal Lahir",
@@ -36,16 +47,6 @@ class FormCatatan(UserControl) :
             last_date=datetime.datetime(2024, 10, 1),
         )
 
-        catatan.dropdown_jeniskelamin = Dropdown(
-            width= 340,
-            label="Jenis Kelamin",
-            hint_text="Jenis Kelamin",
-                options=[
-                    dropdown.Option("Laki-Laki"),
-                    dropdown.Option("Perempuan"),
-                ],
-            autofocus=False,
-        )
 
         catatan.inputan_alamat= TextField(
             label="Alamat",
