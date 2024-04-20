@@ -205,6 +205,7 @@ class FormDataCatatan(UserControl) :
 
         #buat variable utk inputan/field ubah data
         catatan.inputan_catatan_ubah = TextField(expand = True)
+        catatan.inputan_catatan_ubah1 = TextField(expand=True)
 
         #buat form rekapan data yang berhasil di simpan
         catatan.tampil_data = Row(
@@ -238,6 +239,7 @@ class FormDataCatatan(UserControl) :
             controls = [
                 #field / inputan catatan
                 catatan.inputan_catatan_ubah,
+                catatan.inputan_catatan_ubah1,
                 #tombol ubah data
                 IconButton(
                     icon = icons.DONE_OUTLINE_OUTLINED,
