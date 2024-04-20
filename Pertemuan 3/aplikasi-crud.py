@@ -3,6 +3,7 @@ import flet
 import datetime
 from flet import *
 
+
 # Buat class form entri catatan
 class FormCatatan(UserControl) :
     def build(catatan):
