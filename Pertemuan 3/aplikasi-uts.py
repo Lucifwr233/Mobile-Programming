@@ -207,7 +207,7 @@ class FormDataCatatan(UserControl) :
     def build(catatan):
         #buat variabel untuk checkbox
         catatan.data_catatan_nama = Checkbox(value = False, label = catatan.nama_catatan + " ( " + catatan.jk_catatan+ " )" )
-        catatan.data_catatan_tgl = Checkbox(value = False, label = "Tanggal Lahir " + str(catatan.tgl_catatan) )
+        catatan.data_catatan_tgl = Checkbox(value = False, label = "Tanggal Lahir : " + str(catatan.tgl_catatan) )
         catatan.data_catatan_alamat = Checkbox(value = False, label = "Alamat : " + str(catatan.alamat_catatan) )
         catatan.data_catatan_telp = Checkbox(value = False, label = "Telepon : " + str(catatan.telp_catatan) )
         catatan.data_catatan_tglmem = Checkbox(value = False, label = "Tanggal Gabung : " + str(catatan.tglmem_catatan) )
@@ -225,7 +225,12 @@ class FormDataCatatan(UserControl) :
             alignment = "spaceBetween",
             vertical_alignment = "center",
             controls = [
-                catatan.data_catatan_nama,
+                Row(
+                    controls= [
+                        catatan.data_catatan_nama,
+                    ]
+
+                ),
                 Row(
                     spacing = 0,
                     controls = [
@@ -250,6 +255,27 @@ class FormDataCatatan(UserControl) :
             visible = False,
             controls = [
                 #field / inputan catatan
+                Row(
+                    controls= [
+                        Text(" ",
+                            size =20,
+                            font_family="poppins",
+                            color = "white"
+                        ),
+                    ]
+
+                ),
+                Row(
+                    controls= [
+                        Text(" Data ",
+                            size =20,
+                            weight="bold",
+                            font_family="poppins",
+                            color = "white"
+                        ),
+                    ]
+
+                ),
                 Row(
                     controls= [
                         catatan.inputan_catatan_nama,
@@ -280,14 +306,20 @@ class FormDataCatatan(UserControl) :
                 Row(
                     controls=[
                         catatan.inputan_catatan_tglmem,
-                        #tombol ubah data
-                        IconButton(
-                            icon=icons.DONE_OUTLINED,
-                            tooltip = "Simpan Perubahan",
-                            on_click = catatan.simpan_ubah_data,
-                        ),
                     ]
-                )
+                ),
+                Row(
+                    controls=[
+                        #tombol ubah data
+                        FloatingActionButton( 
+                        icon = icons.CHANGE_CIRCLE,
+                        text=("Simpan Perubahan"),
+                        bgcolor = "blue",
+                        width = 340,
+                        on_click = catatan.simpan_ubah_data
+                    )
+                    ]
+                ),
             ],
         )
         return Column(controls = [catatan.tampil_data, catatan.tampil_ubahdata ])
