@@ -151,7 +151,8 @@ class FormCatatan(UserControl) :
                 controls = [
                     #tombol tambah data 
                     FloatingActionButton( 
-                        icon = icons.SAVE_AS,
+                        icon = icons.ADD,
+                        text=("Tambah Data"),
                         bgcolor = "blue",
                         width = 340,
                         on_click = catatan.tambah_catatan
@@ -175,7 +176,7 @@ class FormCatatan(UserControl) :
            catatan.update()
         
         elif catatan.inputan_nama.value != "" or catatan.inputan_jekel.value != "" or catatan.inputan_tgl.value != "" or catatan.inputan_alamat.value != "" or catatan.inputan_telp.value !="" or catatan.inputan_telp.value !="":
-             data_catatan_baru = FormDataCatatan(catatan.inputan_nama.value, catatan.inputan_jekel.value, catatan.hapus_catatan)
+             data_catatan_baru = FormDataCatatan(catatan.inputan_nama.value, catatan.inputan_jekel.value, catatan.inputan_tgl.value, catatan.hapus_catatan)
              catatan.layout_data.controls.append(data_catatan_baru)
              catatan.inputan_nama.value = ""
              catatan.inputan_jekel.value = ""
@@ -192,20 +193,22 @@ class FormCatatan(UserControl) :
 
 #buat class form data rekapan/histori catatan
 class FormDataCatatan(UserControl) :
-    def __init__(catatan, nama_catatan, jk_catatan, hapus_catatan):
+    def __init__(catatan, nama_catatan, jk_catatan, tgl_catatan, hapus_catatan):
         super().__init__()
         catatan.nama_catatan = nama_catatan
         catatan.jk_catatan = jk_catatan
+        catatan.tgl_catatan = tgl_catatan
         catatan.hapus_catatan = hapus_catatan
 
     def build(catatan):
         #buat variabel untuk checkbox
-        catatan.data_catatan = Checkbox(value = False, label = catatan.nama_catatan + " ( " + catatan.jk_catatan+ " )")
+        catatan.data_catatan = Checkbox(value = False, label = catatan.nama_catatan + " ( " + catatan.jk_catatan+ " )" )
+        catatan.data_catatan2 = Checkbox(value = False, label = "Tanggal Gabung " + str(catatan.tgl_catatan) )
         # catatan.data_catatan = Text(catatan.nama_catatan + " ( " + catatan.jk_catatan+ " )")
 
         #buat variable utk inputan/field ubah data
         catatan.inputan_catatan_ubah = TextField(expand = True)
-        catatan.inputan_catatan_ubah1 = TextField(expand=True)
+        catatan.inputan_catatan_ubah2 = TextField(expand=True)
 
         #buat form rekapan data yang berhasil di simpan
         catatan.tampil_data = Row(
@@ -239,6 +242,7 @@ class FormDataCatatan(UserControl) :
             controls = [
                 #field / inputan catatan
                 catatan.inputan_catatan_ubah,
+                catatan.inputan_catatan_ubah2,
                 #tombol ubah data
                 IconButton(
                     icon=icons.DONE_OUTLINED,
@@ -252,6 +256,7 @@ class FormDataCatatan(UserControl) :
     #fungsi utk perintah simpan ubah data
     def simpan_ubah_data(catatan, e):
         catatan.data_catatan.label = catatan.inputan_catatan_ubah.value
+        catatan.data_catatan2.label = catatan.inputan_catatan_ubah2.value
         catatan.tampil_data.visible = True
         catatan.tampil_ubahdata.visible = False
         catatan.update()
@@ -259,6 +264,7 @@ class FormDataCatatan(UserControl) :
     #fungsi utk perintah form ubah data
     def ubah_data(catatan, e):
         catatan.inputan_catatan_ubah.value = catatan.data_catatan.label
+        catatan.inputan_catatan_ubah2.value = catatan.data_catatan2.label
         catatan.tampil_data.visible = False
         catatan.tampil_ubahdata.visible = True
         catatan.update()
