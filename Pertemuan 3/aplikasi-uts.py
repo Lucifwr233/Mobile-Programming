@@ -235,20 +235,28 @@ class FormDataCatatan(UserControl) :
         )
 
         #buat form entri untuk perubahan data
-        catatan.tampil_ubahdata = Row(
+        
+        catatan.tampil_ubahdata = Column(
             visible = False,
-            alignment = "spaceBetween",
-            vertical_alignment = "center",
             controls = [
                 #field / inputan catatan
-                catatan.inputan_catatan_ubah,
-                catatan.inputan_catatan_ubah2,
-                #tombol ubah data
-                IconButton(
-                    icon=icons.DONE_OUTLINED,
-                    tooltip = "Simpan Perubahan",
-                    on_click = catatan.simpan_ubah_data,
+                Row(
+                    controls= [
+                        catatan.inputan_catatan_ubah,
+                    ]
+
                 ),
+                Row(
+                    controls=[
+                        catatan.inputan_catatan_ubah2,
+                        #tombol ubah data
+                        IconButton(
+                            icon=icons.DONE_OUTLINED,
+                            tooltip = "Simpan Perubahan",
+                            on_click = catatan.simpan_ubah_data,
+                        ),
+                    ]
+                )
             ],
         )
         return Column(controls = [catatan.tampil_data, catatan.tampil_ubahdata ])
