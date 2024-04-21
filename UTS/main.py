@@ -129,6 +129,7 @@ class FormCatatan(UserControl) :
                     catatan.inputan_alamat,
                     ]
                 ),
+
                 Row(
                 controls = [
                     catatan.inputan_telp,
@@ -151,7 +152,8 @@ class FormCatatan(UserControl) :
                 controls = [
                     #tombol tambah data 
                     FloatingActionButton( 
-                        icon = icons.SAVE_AS,
+                        icon = icons.ADD,
+                        text=("Tambah Data"),
                         bgcolor = "blue",
                         width = 340,
                         on_click = catatan.tambah_catatan
@@ -174,15 +176,15 @@ class FormCatatan(UserControl) :
            catatan.snack_bar.open = True
            catatan.update()
         
-        elif catatan.inputan_nama.value != "" or catatan.inputan_jekel.value != "" or catatan.inputan_tgl.value != "" or catatan.inputan_alamat.value != "" or catatan.inputan_telp.value !="" or catatan.inputan_telp.value !="":
-             data_catatan_baru = FormDataCatatan(catatan.inputan_nama.value, catatan.inputan_jekel.value, catatan.hapus_catatan)
+        elif catatan.inputan_nama.value != "" or catatan.inputan_jekel.value != "" or catatan.inputan_tgl.value != "" or catatan.inputan_alamat.value != "" or catatan.inputan_telp.value != "" or catatan.inputan_tgl_member.value != "" :
+             data_catatan_baru = FormDataCatatan(catatan.inputan_nama.value, catatan.inputan_jekel.value, catatan.inputan_tgl.value, catatan.inputan_alamat.value, catatan.inputan_telp.value, catatan.inputan_tgl_member.value, catatan.hapus_catatan)
              catatan.layout_data.controls.append(data_catatan_baru)
              catatan.inputan_nama.value = ""
              catatan.inputan_jekel.value = ""
              catatan.inputan_tgl.value = ""
              catatan.inputan_alamat.value = ""
-             catatan.inputan_telp = ""
-             catatan.inputan_tgl_member = ""
+             catatan.inputan_telp.value = ""
+             catatan.inputan_tgl_member.value = ""
              catatan.update()
     
     #fungsi utk perintah hapus data
@@ -192,27 +194,43 @@ class FormCatatan(UserControl) :
 
 #buat class form data rekapan/histori catatan
 class FormDataCatatan(UserControl) :
-    def __init__(catatan, nama_catatan, jk_catatan, hapus_catatan):
+    def __init__(catatan, nama_catatan, jk_catatan, tgl_catatan, alamat_catatan, telp_catatan, tglmem_catatan, hapus_catatan):
         super().__init__()
         catatan.nama_catatan = nama_catatan
         catatan.jk_catatan = jk_catatan
+        catatan.tgl_catatan = tgl_catatan
+        catatan.alamat_catatan = alamat_catatan
+        catatan.telp_catatan = telp_catatan
+        catatan.tglmem_catatan = tglmem_catatan
         catatan.hapus_catatan = hapus_catatan
 
     def build(catatan):
         #buat variabel untuk checkbox
-        #catatan.data_catatan = Checkbox(value = False, label = catatan.isi_catatan)
-        catatan.data_catatan = Text(catatan.nama_catatan + " (" + catatan.jk_catatan+ " )" )
+        catatan.data_catatan_nama = Checkbox(value = False, label = catatan.nama_catatan + " ( " + catatan.jk_catatan+ " )" )
+        catatan.data_catatan_tgl = Checkbox(value = False, label = "Tanggal Lahir : " + str(catatan.tgl_catatan) )
+        catatan.data_catatan_alamat = Checkbox(value = False, label = "Alamat : " + str(catatan.alamat_catatan) )
+        catatan.data_catatan_telp = Checkbox(value = False, label = "Telepon : " + str(catatan.telp_catatan) )
+        catatan.data_catatan_tglmem = Checkbox(value = False, label = "Tanggal Gabung : " + str(catatan.tglmem_catatan) )
+        # catatan.data_catatan = Text(catatan.nama_catatan + " ( " + catatan.jk_catatan+ " )")
 
         #buat variable utk inputan/field ubah data
-        catatan.inputan_catatan_ubah = TextField(expand = True)
-        catatan.inputan_catatan_ubah1 = TextField(expand=True)
+        catatan.inputan_catatan_nama = TextField(expand = True)
+        catatan.inputan_catatan_tgl = TextField(expand=True)
+        catatan.inputan_catatan_alamat= TextField(expand=True)
+        catatan.inputan_catatan_telp= TextField(expand=True)
+        catatan.inputan_catatan_tglmem= TextField(expand=True)
 
         #buat form rekapan data yang berhasil di simpan
         catatan.tampil_data = Row(
             alignment = "spaceBetween",
             vertical_alignment = "center",
             controls = [
-                catatan.data_catatan,
+                Row(
+                    controls= [
+                        catatan.data_catatan_nama,
+                    ]
+
+                ),
                 Row(
                     spacing = 0,
                     controls = [
@@ -232,20 +250,75 @@ class FormDataCatatan(UserControl) :
         )
 
         #buat form entri untuk perubahan data
-        catatan.tampil_ubahdata = Row(
+        
+        catatan.tampil_ubahdata = Column(
             visible = False,
-            alignment = "spaceBetween",
-            vertical_alignment = "center",
             controls = [
                 #field / inputan catatan
-                catatan.inputan_catatan_ubah,
-                catatan.inputan_catatan_ubah1,
-                #tombol ubah data
-                IconButton(
-                    icon = icons.DONE_OUTLINE_OUTLINED,
-                    icon_color = colors.GREEN,
-                    tooltip = "Simpan Perubahan",
-                    on_click = catatan.simpan_ubah_data,
+                Row(
+                    controls= [
+                        Text(" ",
+                            size =20,
+                            font_family="poppins",
+                            color = "white"
+                        ),
+                    ]
+
+                ),
+                Row(
+                    controls= [
+                        Text(" Data ",
+                            size =20,
+                            weight="bold",
+                            font_family="poppins",
+                            color = "white"
+                        ),
+                    ]
+
+                ),
+                Row(
+                    controls= [
+                        catatan.inputan_catatan_nama,
+                    ]
+
+                ),
+                Row(
+                    controls= [
+                        catatan.inputan_catatan_tgl,
+
+                    ]
+
+                ),
+                Row(
+                    controls= [
+                        catatan.inputan_catatan_alamat,
+
+                    ]
+
+                ),
+                Row(
+                    controls= [
+                        catatan.inputan_catatan_telp,
+
+                    ]
+
+                ),
+                Row(
+                    controls=[
+                        catatan.inputan_catatan_tglmem,
+                    ]
+                ),
+                Row(
+                    controls=[
+                        #tombol ubah data
+                        FloatingActionButton( 
+                        icon = icons.CHANGE_CIRCLE,
+                        text=("Simpan Perubahan"),
+                        bgcolor = "blue",
+                        width = 340,
+                        on_click = catatan.simpan_ubah_data
+                    )
+                    ]
                 ),
             ],
         )
@@ -253,14 +326,22 @@ class FormDataCatatan(UserControl) :
 
     #fungsi utk perintah simpan ubah data
     def simpan_ubah_data(catatan, e):
-        catatan.data_catatan.label = catatan.inputan_catatan_ubah.value
+        catatan.data_catatan_nama.label = catatan.inputan_catatan_nama.value
+        catatan.data_catatan_tgl.label = catatan.inputan_catatan_tgl.value
+        catatan.data_catatan_alamat.label = catatan.inputan_catatan_alamat.value
+        catatan.data_catatan_telp.label = catatan.inputan_catatan_telp.value
+        catatan.data_catatan_tglmem.label = catatan.inputan_catatan_tglmem.value
         catatan.tampil_data.visible = True
         catatan.tampil_ubahdata.visible = False
         catatan.update()
 
     #fungsi utk perintah form ubah data
     def ubah_data(catatan, e):
-        catatan.inputan_catatan_ubah.value = catatan.data_catatan.label
+        catatan.inputan_catatan_nama.value = catatan.data_catatan_nama.label
+        catatan.inputan_catatan_tgl.value = catatan.data_catatan_tgl.label
+        catatan.inputan_catatan_alamat.value = catatan.data_catatan_alamat.label
+        catatan.inputan_catatan_telp.value = catatan.data_catatan_telp.label
+        catatan.inputan_catatan_tglmem.value = catatan.data_catatan_tglmem.label
         catatan.tampil_data.visible = False
         catatan.tampil_ubahdata.visible = True
         catatan.update()
@@ -290,6 +371,30 @@ def main (page : Page):
     form_aplikasi_note = FormCatatan()
 
     page.add(
+        Row (
+            controls = [
+                Text(judul_aplikasi_3,
+                    size =15,
+                    weight = "bold",
+                    font_family="poppins",
+                    color = "Blue"
+                ),
+            ],
+            #aligment = MainAxisAlignment.END
+            alignment = "center"
+        ),
+        Row (
+            controls = [
+                Text(judul_aplikasi_3,
+                    size =15,
+                    weight = "bold",
+                    font_family="poppins",
+                    color = "Blue"
+                ),
+            ],
+            #aligment = MainAxisAlignment.END
+            alignment = "center"
+        ),
         Row (
             controls = [
                 Text(judul_aplikasi_3,
