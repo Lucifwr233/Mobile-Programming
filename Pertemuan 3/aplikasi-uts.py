@@ -200,11 +200,12 @@ class FormDataCatatan(UserControl) :
 
     def build(catatan):
         #buat variabel untuk checkbox
-        #catatan.data_catatan = Checkbox(value = False, label = catatan.isi_catatan)
-        catatan.data_catatan = Text(catatan.nama_catatan + " (" + catatan.jk_catatan+ " )" )
+        catatan.data_catatan = Checkbox(value = False, label = catatan.nama_catatan + " ( " + catatan.jk_catatan+ " )")
+        # catatan.data_catatan = Text(catatan.nama_catatan + " ( " + catatan.jk_catatan+ " )")
 
         #buat variable utk inputan/field ubah data
         catatan.inputan_catatan_ubah = TextField(expand = True)
+        catatan.inputan_catatan_ubah1 = TextField(expand=True)
 
         #buat form rekapan data yang berhasil di simpan
         catatan.tampil_data = Row(
@@ -240,8 +241,7 @@ class FormDataCatatan(UserControl) :
                 catatan.inputan_catatan_ubah,
                 #tombol ubah data
                 IconButton(
-                    icon = icons.DONE_OUTLINE_OUTLINED,
-                    icon_color = colors.GREEN,
+                    icon=icons.DONE_OUTLINED,
                     tooltip = "Simpan Perubahan",
                     on_click = catatan.simpan_ubah_data,
                 ),
