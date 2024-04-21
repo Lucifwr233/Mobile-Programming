@@ -206,11 +206,11 @@ class FormDataCatatan(UserControl) :
 
     def build(catatan):
         #buat variabel untuk checkbox
-        catatan.data_catatan_nama = Checkbox(value = False, label = catatan.nama_catatan + " ( " + catatan.jk_catatan+ " )" )
-        catatan.data_catatan_tgl = Checkbox(value = False, label = "Tanggal Lahir : " + str(catatan.tgl_catatan) )
-        catatan.data_catatan_alamat = Checkbox(value = False, label = "Alamat : " + str(catatan.alamat_catatan) )
-        catatan.data_catatan_telp = Checkbox(value = False, label = "Telepon : " + str(catatan.telp_catatan) )
-        catatan.data_catatan_tglmem = Checkbox(value = False, label = "Tanggal Gabung : " + str(catatan.tglmem_catatan) )
+        catatan.data_catatan_nama = Checkbox(value = False, label = catatan.nama_catatan + " ( " + catatan.jk_catatan+ " )", label_position=LabelPosition.LEFT  )
+        catatan.data_catatan_tgl = Checkbox(value = False, label = "Tanggal Lahir : " + str(catatan.tgl_catatan), label_position=LabelPosition.LEFT  )
+        catatan.data_catatan_alamat = Checkbox(value = False, label = "Alamat : " + str(catatan.alamat_catatan), label_position=LabelPosition.LEFT  )
+        catatan.data_catatan_telp = Checkbox(value = False, label = "Telepon : " + str(catatan.telp_catatan), label_position=LabelPosition.LEFT )
+        catatan.data_catatan_tglmem = Checkbox(value = False, label = "Tanggal Gabung : " + str(catatan.tglmem_catatan), label_position=LabelPosition.LEFT  )
         # catatan.data_catatan = Text(catatan.nama_catatan + " ( " + catatan.jk_catatan+ " )")
 
         #buat variable utk inputan/field ubah data
