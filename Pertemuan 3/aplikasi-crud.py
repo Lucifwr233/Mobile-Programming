@@ -121,7 +121,7 @@ class FormCatatan(UserControl) :
             catatan.snackbar.open = True
             catatan.update()
 
-        elif catatan.inputan_nama.value != "" or catatan.dropdown_jeniskelamin.value != "" or catatan.inputan_tgl_baru.value != "" or catatan.inputan_alamat != "" :
+        elif catatan.inputan_nama.value != "" or catatan.dropdown_jeniskelamin.value != "" or catatan.inputan_tgl_baru.value != "" or catatan.inputan_alamat.value != "" :
             data_catatan_baru = FormDataCatatan(catatan.inputan_nama.value,catatan.dropdown_jeniskelamin.value ,catatan.hapus_catatan)
             catatan.layout_data.controls.append(data_catatan_baru)
             catatan.inputan_nama.value = ""

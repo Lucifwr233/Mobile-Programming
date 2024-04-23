@@ -9,6 +9,7 @@ class FormCatatan(UserControl) :
     def build(catatan) :
         #buat variabel untuk inputan catatan
         catatan.inputan_nama = TextField(
+            label  = "Nama",
             hint_text = "Nama",
             autofocus=True,
             expand = True
@@ -44,13 +45,17 @@ class FormCatatan(UserControl) :
         )
 
         catatan.inputan_tgl = TextField(
+            label = "Tanggal Lahir",
             hint_text = "Tanggal Lahir",
+            read_only = True,
             expand = True
         )
 
         #buat variabel inputan tanggal gabung member
         catatan.inputan_tgl_member = TextField(
+            label= "Tanggal Gabung Member",
             hint_text = "Tanggal Gabung Member",
+            read_only = True,
             expand = True
         )
 
@@ -371,30 +376,6 @@ def main (page : Page):
     form_aplikasi_note = FormCatatan()
 
     page.add(
-        Row (
-            controls = [
-                Text(judul_aplikasi_3,
-                    size =15,
-                    weight = "bold",
-                    font_family="poppins",
-                    color = "Blue"
-                ),
-            ],
-            #aligment = MainAxisAlignment.END
-            alignment = "center"
-        ),
-        Row (
-            controls = [
-                Text(judul_aplikasi_3,
-                    size =15,
-                    weight = "bold",
-                    font_family="poppins",
-                    color = "Blue"
-                ),
-            ],
-            #aligment = MainAxisAlignment.END
-            alignment = "center"
-        ),
         Row (
             controls = [
                 Text(judul_aplikasi_3,
