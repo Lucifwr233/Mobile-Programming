@@ -249,6 +249,7 @@ class FormDataCatatan(UserControl) :
                 Row(
                     controls= [
                         catatan.data_catatan_nama,
+                        catatan.data_jk_catatan,
                     ]
 
                 ),
@@ -354,6 +355,7 @@ class FormDataCatatan(UserControl) :
     #fungsi utk perintah simpan ubah data
     def simpan_ubah_data(catatan, e):
         catatan.data_catatan_nama.value = catatan.inputan_catatan_nama.value
+        catatan.data_jk_catatan.value = catatan.inputan_catatan_jk.value
         catatan.data_catatan_tgl.value = catatan.inputan_catatan_tgl.value
         catatan.data_catatan_alamat.value = catatan.inputan_catatan_alamat.value
         catatan.data_catatan_telp.value = catatan.inputan_catatan_telp.value
