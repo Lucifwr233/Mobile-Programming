@@ -201,14 +201,14 @@ class FormDataCatatan(UserControl) :
 
     # Fungsi untuk perintah simpan data
     def simpan_ubah_data(catatan, e):
-        catatan.data_catatan.label = catatan.inputan_catatan_ubah.value
+        catatan.data_catatan.value = catatan.inputan_catatan_ubah.value
         catatan.tampil_data.visible = True
         catatan.tampil_ubah_data.visible = False
         catatan.update()
 
     # Fungsi untuk ubah form data update
     def ubah_data(catatan, e):
-        catatan.inputan_catatan_ubah.value = catatan.data_catatan.label
+        catatan.inputan_catatan_ubah.value = catatan.data_catatan.value
         catatan.tampil_data.visible = False
         catatan.tampil_ubah_data.visible = True
         catatan.update()

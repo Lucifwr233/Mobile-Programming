@@ -221,12 +221,16 @@ class FormDataCatatan(UserControl) :
 
     def build(catatan):
         #buat variabel untuk checkbox
-        catatan.data_catatan_nama = Checkbox(value = False, label = catatan.nama_catatan, label_position=LabelPosition.LEFT  )
-        catatan.data_jk_catatan = Checkbox(value= False, label= str(catatan.jk_catatan), label_position=LabelPosition.LEFT )
-        catatan.data_catatan_tgl = Checkbox(value = False, label = str(catatan.tgl_catatan), label_position=LabelPosition.LEFT  )
-        catatan.data_catatan_alamat = Checkbox(value = False, label = str(catatan.alamat_catatan), label_position=LabelPosition.LEFT  )
-        catatan.data_catatan_telp = Checkbox(value = False, label = str(catatan.telp_catatan), label_position=LabelPosition.LEFT )
-        catatan.data_catatan_tglmem = Checkbox(value = False, label = str(catatan.tglmem_catatan), label_position=LabelPosition.LEFT  )
+        # catatan.data_catatan_nama = Checkbox(value = False, label = catatan.nama_catatan, label_position=LabelPosition.LEFT  )
+        catatan.data_catatan_nama = Text(catatan.nama_catatan)
+        # catatan.data_jk_catatan = Checkbox(value= False, label= str(catatan.jk_catatan), label_position=LabelPosition.LEFT )
+        catatan.data_jk_catatan = Text(str(catatan.jk_catatan) )
+        # catatan.data_catatan_tgl = Checkbox(value = False, label = str(catatan.tgl_catatan), label_position=LabelPosition.LEFT  )
+        catatan.data_catatan_tgl = Text(str(catatan.tgl_catatan))
+        # catatan.data_catatan_alamat = Checkbox(value = False, label = str(catatan.alamat_catatan), label_position=LabelPosition.LEFT  )
+        catatan.data_catatan_alamat = Text(str(catatan.alamat_catatan))
+        catatan.data_catatan_telp = Text(str(catatan.telp_catatan) )
+        catatan.data_catatan_tglmem = Text(str(catatan.tglmem_catatan))
         # catatan.data_catatan = Text(catatan.nama_catatan + " ( " + catatan.jk_catatan+ " )")
 
         #buat variable utk inputan/field ubah data
@@ -349,23 +353,23 @@ class FormDataCatatan(UserControl) :
 
     #fungsi utk perintah simpan ubah data
     def simpan_ubah_data(catatan, e):
-        catatan.data_catatan_nama.label = catatan.inputan_catatan_nama.value
-        catatan.data_catatan_tgl.label = catatan.inputan_catatan_tgl.value
-        catatan.data_catatan_alamat.label = catatan.inputan_catatan_alamat.value
-        catatan.data_catatan_telp.label = catatan.inputan_catatan_telp.value
-        catatan.data_catatan_tglmem.label = catatan.inputan_catatan_tglmem.value
+        catatan.data_catatan_nama.value = catatan.inputan_catatan_nama.value
+        catatan.data_catatan_tgl.value = catatan.inputan_catatan_tgl.value
+        catatan.data_catatan_alamat.value = catatan.inputan_catatan_alamat.value
+        catatan.data_catatan_telp.value = catatan.inputan_catatan_telp.value
+        catatan.data_catatan_tglmem.value = catatan.inputan_catatan_tglmem.value
         catatan.tampil_data.visible = True
         catatan.tampil_ubahdata.visible = False
         catatan.update()
 
     #fungsi utk perintah form ubah data
     def ubah_data(catatan, e):
-        catatan.inputan_catatan_nama.value = catatan.data_catatan_nama.label
-        catatan.inputan_catatan_jk.value = catatan.data_jk_catatan.label
-        catatan.inputan_catatan_tgl.value = catatan.data_catatan_tgl.label
-        catatan.inputan_catatan_alamat.value = catatan.data_catatan_alamat.label
-        catatan.inputan_catatan_telp.value = catatan.data_catatan_telp.label
-        catatan.inputan_catatan_tglmem.value = catatan.data_catatan_tglmem.label
+        catatan.inputan_catatan_nama.value = catatan.data_catatan_nama.value
+        catatan.inputan_catatan_jk.value = catatan.data_jk_catatan.value
+        catatan.inputan_catatan_tgl.value = catatan.data_catatan_tgl.value
+        catatan.inputan_catatan_alamat.value = catatan.data_catatan_alamat.value
+        catatan.inputan_catatan_telp.value = catatan.data_catatan_telp.value
+        catatan.inputan_catatan_tglmem.value = catatan.data_catatan_tglmem.value
         catatan.tampil_data.visible = False
         catatan.tampil_ubahdata.visible = True
         catatan.update()
