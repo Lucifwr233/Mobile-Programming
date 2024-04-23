@@ -107,7 +107,9 @@ class FormCatatan(UserControl) :
         )
 
         #buat variabel utk layout data rekapan
-        catatan.layout_data = Column()
+        catatan.layout_data = Column(
+            
+        )
 
         return Column(
             controls = [

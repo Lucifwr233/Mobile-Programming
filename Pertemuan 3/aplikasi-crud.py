@@ -123,15 +123,12 @@ class FormCatatan(UserControl) :
 
         elif catatan.inputan_nama.value != "" or catatan.dropdown_jeniskelamin.value != "" or catatan.inputan_tgl_baru.value != "" or catatan.inputan_alamat.value != "" :
             
-            tgl_lahir_nilai = catatan.inputan_tgl_baru.value
-            tgl_lahir_nilai_konversi = tgl_lahir_nilai.strftime('%Y-%m-%d')
-            
             data_catatan_baru = FormDataCatatan(catatan.inputan_nama.value,catatan.dropdown_jeniskelamin.value , catatan.inputan_tgl_baru.value, catatan.inputan_alamat.value,catatan.hapus_catatan)
             catatan.layout_data.controls.append(data_catatan_baru)
             catatan.inputan_nama.value = ""
             catatan.dropdown_jeniskelamin.value = ""
             catatan.inputan_tgl_baru.value = ""
-            catatan.inputan_alamat = ""
+            catatan.inputan_alamat.value = ""
             catatan.update()
 
     # Fungsi perintah hapus data
@@ -152,7 +149,7 @@ class FormDataCatatan(UserControl) :
 
     def build(catatan):
         # catatan.data_catatan = Checkbox(value=False, label=catatan.isi_catatan)
-        catatan.data_catatan = Text(catatan.nama_catatan + " (" + catatan.jk_catatan+ ", "+ catatan.tgl_catatan +" )" )
+        catatan.data_catatan = Text(catatan.nama_catatan + " (" + catatan.jk_catatan+ ", "+ str(catatan.tgl_catatan) +" )" )
 
         # Buat variabel untuk inputan ubah data
         catatan.inputan_catatan_ubah = TextField(expand=True)
