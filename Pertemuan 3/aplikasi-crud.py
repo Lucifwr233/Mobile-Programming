@@ -117,12 +117,16 @@ class FormCatatan(UserControl) :
 
     # Fungsi perintah tambah data
     def tambah_catatan (catatan, e) :
-        if catatan.inputan_nama.value == "" or catatan.dropdown_jeniskelamin == "" or catatan.inputan_tgl_baru =="" or catatan.inputan_alamat =="" :
+        if catatan.inputan_nama.value == "" or catatan.dropdown_jeniskelamin.value == "" or catatan.inputan_tgl_baru.value =="" or catatan.inputan_alamat.value =="" :
             catatan.snackbar.open = True
             catatan.update()
 
         elif catatan.inputan_nama.value != "" or catatan.dropdown_jeniskelamin.value != "" or catatan.inputan_tgl_baru.value != "" or catatan.inputan_alamat.value != "" :
-            data_catatan_baru = FormDataCatatan(catatan.inputan_nama.value,catatan.dropdown_jeniskelamin.value ,catatan.hapus_catatan)
+            
+            tgl_lahir_nilai = catatan.inputan_tgl_baru.value
+            tgl_lahir_nilai_konversi = tgl_lahir_nilai.strftime('%Y-%m-%d')
+            
+            data_catatan_baru = FormDataCatatan(catatan.inputan_nama.value,catatan.dropdown_jeniskelamin.value , catatan.inputan_tgl_baru.value, catatan.inputan_alamat.value,catatan.hapus_catatan)
             catatan.layout_data.controls.append(data_catatan_baru)
             catatan.inputan_nama.value = ""
             catatan.dropdown_jeniskelamin.value = ""
@@ -138,15 +142,17 @@ class FormCatatan(UserControl) :
 
 # Membuat class form data rekapan
 class FormDataCatatan(UserControl) :
-    def __init__(catatan, nama_catatan, jk_catatan, hapus_catatan):
+    def __init__(catatan, nama_catatan, jk_catatan, tgl_catatan, alamat_catatan, hapus_catatan):
         super().__init__()
         catatan.nama_catatan = nama_catatan
         catatan.jk_catatan = jk_catatan
+        catatan.tgl_catatan = tgl_catatan
+        catatan.alamat_catatan = alamat_catatan
         catatan.hapus_catatan = hapus_catatan
 
     def build(catatan):
         # catatan.data_catatan = Checkbox(value=False, label=catatan.isi_catatan)
-        catatan.data_catatan = Text(catatan.nama_catatan + " (" + catatan.jk_catatan+ " )" )
+        catatan.data_catatan = Text(catatan.nama_catatan + " (" + catatan.jk_catatan+ ", "+ catatan.tgl_catatan +" )" )
 
         # Buat variabel untuk inputan ubah data
         catatan.inputan_catatan_ubah = TextField(expand=True)
