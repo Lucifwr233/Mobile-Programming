@@ -223,10 +223,20 @@ class FormDataCatatan(UserControl) :
     def build(catatan):
         def ubah_tanggal_member_edit(e):
             tgl_baru = catatan.opsi_tanggal_member_edit.value
-            catatan.inputan_catatan_tgl.value = tgl_baru.date()
+            catatan.inputan_catatan_tglmem.value = tgl_baru.date()
             catatan.update()
 
         def opsi_tanggal_member_edit_dismissed(e):
+            tgl_baru = catatan.inputan_catatan_tglmem.value
+            catatan.inputan_catatan_tglmem.value = tgl_baru
+            catatan.update()
+            
+        def ubah_tanggal_edit(e):
+            tgl_baru = catatan.opsi_tanggal_edit.value
+            catatan.inputan_catatan_tgl.value = tgl_baru.date()
+            catatan.update()
+
+        def opsi_tanggal_edit_dismissed(e):
             tgl_baru = catatan.inputan_catatan_tgl.value
             catatan.inputan_catatan_tgl.value = tgl_baru
             catatan.update()
@@ -265,6 +275,12 @@ class FormDataCatatan(UserControl) :
         catatan.opsi_tanggal_member_edit = DatePicker(
             on_change= ubah_tanggal_member_edit,
             on_dismiss= opsi_tanggal_member_edit_dismissed,
+            first_date= datetime.datetime (1945, 1, 1),
+            last_date= datetime.date.today(),
+        )    
+        catatan.opsi_tanggal_edit = DatePicker(
+            on_change= ubah_tanggal_edit,
+            on_dismiss= opsi_tanggal_edit_dismissed,
             first_date= datetime.datetime (1945, 1, 1),
             last_date= datetime.date.today(),
         )    
@@ -342,12 +358,12 @@ class FormDataCatatan(UserControl) :
                 Row(
                     controls= [
                         catatan.inputan_catatan_tgl,
-                        catatan.opsi_tanggal_member_edit,
+                        catatan.opsi_tanggal_edit,
                         FloatingActionButton(
                             "Pick date",
                             bgcolor = "blue",
                             icon=icons.CALENDAR_MONTH_ROUNDED,
-                            on_click=lambda _: catatan.opsi_tanggal_member_edit.pick_date(),
+                            on_click=lambda _: catatan.opsi_tanggal_edit.pick_date(),
                         )
                     ]
 
@@ -369,6 +385,13 @@ class FormDataCatatan(UserControl) :
                 Row(
                     controls=[
                         catatan.inputan_catatan_tglmem,
+                        catatan.opsi_tanggal_member_edit,
+                        FloatingActionButton(
+                            "Pick date",
+                            bgcolor = "blue",
+                            icon=icons.CALENDAR_MONTH_ROUNDED,
+                            on_click=lambda _: catatan.opsi_tanggal_member_edit.pick_date(),
+                        )
                     ]
                 ),
                 Row(
