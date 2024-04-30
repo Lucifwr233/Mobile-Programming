@@ -209,6 +209,7 @@ class FormCatatan(UserControl) :
 
 #buat class form data rekapan/histori catatan
 class FormDataCatatan(UserControl) :
+
     def __init__(catatan, nama_catatan, jk_catatan, tgl_catatan, alamat_catatan, telp_catatan, tglmem_catatan, hapus_catatan):
         super().__init__()
         catatan.nama_catatan = nama_catatan
@@ -220,6 +221,15 @@ class FormDataCatatan(UserControl) :
         catatan.hapus_catatan = hapus_catatan
 
     def build(catatan):
+        def ubah_tanggal_member_edit(e):
+            tgl_baru = catatan.opsi_tanggal_member_edit.value
+            catatan.inputan_catatan_tgl.value = tgl_baru.date()
+            catatan.update()
+
+        def opsi_tanggal_member_edit_dismissed(e):
+            tgl_baru = catatan.inputan_catatan_tgl.value
+            catatan.inputan_catatan_tgl.value = tgl_baru
+            catatan.update()
         #buat variabel untuk checkbox
         # catatan.data_catatan_nama = Checkbox(value = False, label = catatan.nama_catatan, label_position=LabelPosition.LEFT  )
         catatan.data_catatan_nama = Text(catatan.nama_catatan)
@@ -235,13 +245,29 @@ class FormDataCatatan(UserControl) :
 
         #buat variable utk inputan/field ubah data
         catatan.inputan_catatan_nama = TextField(label = "Nama", border_color= "grey", expand = True)
-        catatan.inputan_catatan_jk = TextField(label = "Jenis Kelamin", border_color= "grey", expand = True)
+        # catatan.inputan_catatan_jk = TextField(label = "Jenis Kelamin", border_color= "grey", expand = True)
+        catatan.inputan_catatan_jk =   Dropdown(
+            border_color= "grey",
+            hint_text = "Jenis Kelamin",
+            expand = True,
+            label="Jenis Kelamin",
+            options=[
+               dropdown.Option("Laki-Laki"),
+               dropdown.Option("Perempuan"),
+            ],
+        )
         catatan.inputan_catatan_tgl = TextField(label = "Tanggal Lahir", border_color= "grey", expand=True)
         catatan.inputan_catatan_alamat= TextField(label = "Alamat", border_color= "grey", expand=True)
         catatan.inputan_catatan_telp= TextField(label = "Nomor Telepon", border_color= "grey", expand=True)
         catatan.inputan_catatan_tglmem= TextField(label = "Tanggal Member", border_color= "grey", expand=True)
 
         #buat form rekapan data yang berhasil di simpan
+        catatan.opsi_tanggal_member_edit = DatePicker(
+            on_change= ubah_tanggal_member_edit,
+            on_dismiss= opsi_tanggal_member_edit_dismissed,
+            first_date= datetime.datetime (1945, 1, 1),
+            last_date= datetime.date.today(),
+        )    
         catatan.tampil_data = Row(
             alignment = "spaceBetween",
             vertical_alignment = "center",
@@ -271,8 +297,11 @@ class FormDataCatatan(UserControl) :
             ],
         )
 
+    
+
+
+
         #buat form entri untuk perubahan data
-        
         catatan.tampil_ubahdata = Column(
             visible = False,
             controls = [
@@ -313,7 +342,13 @@ class FormDataCatatan(UserControl) :
                 Row(
                     controls= [
                         catatan.inputan_catatan_tgl,
-
+                        catatan.opsi_tanggal_member_edit,
+                        FloatingActionButton(
+                            "Pick date",
+                            bgcolor = "blue",
+                            icon=icons.CALENDAR_MONTH_ROUNDED,
+                            on_click=lambda _: catatan.opsi_tanggal_member_edit.pick_date(),
+                        )
                     ]
 
                 ),
