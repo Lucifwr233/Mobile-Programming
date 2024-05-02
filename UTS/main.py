@@ -9,6 +9,7 @@ from flet import *
 
 
 
+
 #buat class form entri catatan
 class FormCatatan(UserControl) :
     def build(catatan) :
