@@ -374,7 +374,6 @@ class FormDataCatatan(UserControl) :
 
                     ]
 
-
                 ),
                 Row(
                     controls= [
