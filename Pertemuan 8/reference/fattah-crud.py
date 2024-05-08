@@ -3,7 +3,16 @@
 import datetime
 import flet
 from flet import *
+import mysql.connector
 
+# CONECTION TO DB
+mydb = mysql.connector.connect(
+	host = "localhost",
+	user = "root",
+	password = "",
+	database = "fattah_crud_mobile"
+)
+cursor = mydb.cursor()
 
 #buat class form entri crud
 class FormCrud(UserControl) :
@@ -107,6 +116,19 @@ class FormCrud(UserControl) :
             show_close_icon= True
         )
 
+        crud.data_member = DataTable(
+            columns=[
+                DataColumn(Text("ID")),
+                DataColumn(Text("Nama")),
+                DataColumn(Text("Jenis Kelamin")),
+                DataColumn(Text("Tanggal Lahir")),
+                DataColumn(Text("Alamat")),
+                DataColumn(Text("Telepon")),
+                DataColumn(Text("Tanggal Gabung Member")),
+            ],
+            rows= []
+        )
+
         #buat variabel utk layout data rekapan
         crud.layout_data = Column(
             
@@ -172,18 +194,105 @@ class FormCrud(UserControl) :
                         text=("Tambah Data"),
                         bgcolor = "blue",
                         width = 340,
+                        on_click= crud.simpan_data_baru,
                     )
                     ]
                 ),
 
             #layout rekapan data
             crud.layout_data,
-            #snakbar
-            crud.snack_bar,
             #tanggal
             crud.opsi_tanggal,
             ]  
         )
+
+            # DELETE FUNCTION
+        def hapus_data(e):
+            print("you selected id is = ", e.control.data['id'])
+            try:
+                sql = "DELETE FROM membership WHERE id = %s"
+                val = (e.control.data['id'],)
+                cursor.execute(sql, val)
+                mydb.commit()
+                print("you deleted !")
+                data_mahasiswa.rows.clear()
+                tampil_data_mahasiswa()
+
+                # AND SHOW SNACKBAR
+                page.snack_bar = SnackBar(
+                    Text("Data success Deleted",size = 30),
+                    bgcolor = "red"
+                )
+                page.snack_bar.open = True
+                page.update()
+            except Exception as e:
+                print(e)
+                print("error you code for delete")
+
+        def tampil_data_member():
+            # GET ALL DATA FROM DATABASE AND PUSH TO DATATABLE
+            cursor.execute("SELECT * FROM membership")
+            result = cursor.fetchall()
+
+            # AND PUSH DATA TO DICT
+            columns = [column[0] for column in cursor.description]
+            rows = [dict(zip(columns,row)) for row in result]
+
+            # LOOP AND PUSH
+            for row in rows:
+                data_member.rows.append(
+                    DataRow(
+                        cells = [
+                            DataCell(Text(row['id'])),
+                            DataCell(Text(row['nama'])),
+                            DataCell(Text(row['jekel'])),
+                            DataCell(Text(row['tgl_lahir'])),
+                            DataCell(Text(row['alamat'])),
+                            DataCell(Text(row['telp'])),
+                            DataCell(Text(row['tgl_member'])),
+                            DataCell(
+                                Row([
+                                    IconButton("delete",icon_color = "red",
+                                        data = row,
+                                        on_click = hapus_data
+                                    ),
+                                    IconButton("create",icon_color = "red",
+                                        data = row,
+                                        on_click = tampil_ubah_data
+                                    ),
+                                ])
+                            ),
+                        ]
+                    )
+
+                )
+            page.update()
+            # calling data from database when app open for the first time
+            tampil_data_member()
+
+            def simpan_data_baru(e):
+                try:
+                    sql = "INSERT INTO membership (nama,jekel,tgl_lahir,alamat,telp,tgl_member) VALUES(%s,%s)"
+                    val = (crud.inputan_nama.value,crud.inputan_jekel.value,crud.inputan_tgl.value,crud.inputan_alamat.value,crud.inputan_telp.value,crud.inputan_tgl_member.value)
+                    cursor.execute(sql,val)
+                    mydb.commit()
+                    print(cursor.rowcount,"YOU RECORD INSERT !!!")
+
+                    # AND CLEAR ROWS IN TABLE AND PUSH FROM DATABASE AGAIN
+                    data_member.rows.clear()
+                    tampil_data_member()
+
+                    # AND SHOW SNACKBAR
+                    page.snack_bar = SnackBar(
+                        Text("Data success add",size = 30),
+                        bgcolor="green"
+
+                    )
+                    page.snack_bar.open = True
+                    page.update()
+                except Exception as e:
+                    print(e)
+                    print("error you CODE !!!!")
      
 
 #function/fungsi utama 
@@ -204,7 +313,6 @@ def main (page : Page):
     judul_aplikasi_3 = '  '
     deskripsi_aplikasi = 'Aplikasi Input Membership Fattah Barbershop'
 
-    form_aplikasi_note = FormCrud()
 
     page.add(
         Row (
@@ -263,7 +371,7 @@ def main (page : Page):
             #aligment = MainAxisAlignment.END
             alignment = "center"
         ),
-        form_aplikasi_note
+        FormCrud()
     )
 
 #mengatur output aplikasi
