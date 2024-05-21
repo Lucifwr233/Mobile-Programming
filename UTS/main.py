@@ -5,10 +5,10 @@ import flet
 from flet import *
 
 
-#buat class form entri catatan
+#buat class form entri 
 class FormCatatan(UserControl) :
     def build(catatan) :
-        #buat variabel untuk inputan catatan
+        #buat variabel untuk inputan 
         catatan.inputan_nama = TextField(
             border_color= "grey",
             label  = "Nama",
@@ -17,7 +17,7 @@ class FormCatatan(UserControl) :
             expand = True
         )
 
-        #buat variabel untuk inputan catatan2
+        #buat variabel untuk inputan 
         catatan.inputan_jekel = Dropdown(
             border_color= "grey",
             hint_text = "Jenis Kelamin",
@@ -208,7 +208,7 @@ class FormCatatan(UserControl) :
         catatan.layout_data.controls.remove(data_catatan_masuk)
         catatan.update()
 
-#buat class form data rekapan/histori catatan
+#buat class form data rekapan/histori 
 class FormDataCatatan(UserControl) :
 
     def __init__(catatan, nama_catatan, jk_catatan, tgl_catatan, alamat_catatan, telp_catatan, tglmem_catatan, hapus_catatan):
@@ -435,14 +435,14 @@ class FormDataCatatan(UserControl) :
         catatan.tampil_ubahdata.visible = True
         catatan.update()
 
-    #fungsi utk perintah hapus catatan
+    #fungsi utk perintah hapus 
     def hapus_data(catatan, e):
         catatan.hapus_catatan(catatan)        
 
 #function/fungsi utama 
 def main (page : Page):
     #mengatur halaman
-    page.title = "Aplikasi Note"
+    page.title = "Membership Fattah Barbershop"
     page.window_width = 375
     page.window_height = 700
     page.window_resizable = False
