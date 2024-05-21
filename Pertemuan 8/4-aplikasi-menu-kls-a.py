@@ -283,12 +283,12 @@ class FormDosen(UserControl):
         rows = [dict(zip(columns,row)) for row in result]
         dosen.data_dosen = DataTable(
             columns = [
-                # DataColumn(Text("ID Dosen")),
+                DataColumn(Text("ID Dosen")),
                 DataColumn(Text("NIDN")),
                 DataColumn(Text("Nama")),
                 DataColumn(Text("JK")),
-                # DataColumn(Text("Tanggal Lahir")),
-                # DataColumn(Text("Alamat")),
+                DataColumn(Text("Tanggal Lahir")),
+                DataColumn(Text("Alamat")),
                 DataColumn(Text("Opsi")),
             ],
         )
@@ -296,12 +296,12 @@ class FormDosen(UserControl):
             dosen.data_dosen.rows.append(
                 DataRow(
                     cells = [
-                            # DataCell(Text(row['id_dosen'])),
+                            DataCell(Text(row['id_dosen'])),
                             DataCell(Text(row['nidn_dosen'])),
                             DataCell(Text(row['nama_dosen'])),
                             DataCell(Text(row['jk_dosen'])),
-                            # DataCell(Text(row['tgl_lahir_dosen'])),
-                            # DataCell(Text(row['alamat_dosen'])),
+                            DataCell(Text(row['tgl_lahir_dosen'])),
+                            DataCell(Text(row['alamat_dosen'])),
                         DataCell(
                             Row([
                                 IconButton("delete", icon_color = "red", data = row, ),
@@ -361,7 +361,10 @@ class FormDosen(UserControl):
         return Column(
             controls = [
                 Row([ElevatedButton("Tambah Data", icon = icons.ADD, icon_color="white", color = "white", bgcolor = "teal", on_click = tampil_dialog_dosen)], alignment = MainAxisAlignment.END),
-                dosen.data_dosen, dosen.dialog, dosen.snack_bar_berhasil
+                Row(
+                    [dosen.data_dosen], scroll=ScrollMode.ALWAYS
+                ),
+                dosen.dialog, dosen.snack_bar_berhasil
             ],
             
         )
@@ -370,7 +373,7 @@ class FormDosen(UserControl):
 def main (page : Page):
     # mengatur halaman
     page.title = "Kelas A - Aplikasi CRUD (Menu & SQL)"
-    page.window_width = 450
+    page.window_width = 350
     page.window_height = 700
     page.window_resizable = False
     page.window_maximizable = False
