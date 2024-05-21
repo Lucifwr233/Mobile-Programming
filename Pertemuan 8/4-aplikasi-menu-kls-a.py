@@ -283,12 +283,12 @@ class FormDosen(UserControl):
         rows = [dict(zip(columns,row)) for row in result]
         dosen.data_dosen = DataTable(
             columns = [
-                DataColumn(Text("ID Dosen")),
-                DataColumn(Text("NIDN Dosen")),
-                DataColumn(Text("Nama Dosen")),
-                DataColumn(Text("Jenis Kelamin")),
-                DataColumn(Text("Tanggal Lahir")),
-                DataColumn(Text("Alamat")),
+                # DataColumn(Text("ID Dosen")),
+                DataColumn(Text("NIDN")),
+                DataColumn(Text("Nama")),
+                DataColumn(Text("JK")),
+                # DataColumn(Text("Tanggal Lahir")),
+                # DataColumn(Text("Alamat")),
                 DataColumn(Text("Opsi")),
             ],
         )
@@ -296,12 +296,12 @@ class FormDosen(UserControl):
             dosen.data_dosen.rows.append(
                 DataRow(
                     cells = [
-                            DataCell(Text(row['id_dosen'])),
+                            # DataCell(Text(row['id_dosen'])),
                             DataCell(Text(row['nidn_dosen'])),
                             DataCell(Text(row['nama_dosen'])),
                             DataCell(Text(row['jk_dosen'])),
-                            DataCell(Text(row['tgl_lahir_dosen'])),
-                            DataCell(Text(row['alamat_dosen'])),
+                            # DataCell(Text(row['tgl_lahir_dosen'])),
+                            # DataCell(Text(row['alamat_dosen'])),
                         DataCell(
                             Row([
                                 IconButton("delete", icon_color = "red", data = row, ),
@@ -335,8 +335,8 @@ class FormDosen(UserControl):
                                     icon_color = "white",
                                     color = "white",
                                     bgcolor = "teal",
-                                    width = 280,
-                                    height = 150,
+                                    width =  250,
+                                    height = 100,
                                     on_click = simpan_dosen,
                                 )
                         ]),
@@ -370,7 +370,7 @@ class FormDosen(UserControl):
 def main (page : Page):
     # mengatur halaman
     page.title = "Kelas A - Aplikasi CRUD (Menu & SQL)"
-    page.window_width = 375
+    page.window_width = 450
     page.window_height = 700
     page.window_resizable = False
     page.window_maximizable = False
