@@ -249,7 +249,7 @@ class FormDosen(UserControl):
                 koneksi_db.commit()
                 print(cursor.rowcount, "Data di simpan!")
 
-                tampil_data(e)
+                tampil_data_dosen(e)
                 dosen.dialog.open = False
                 dosen.snack_bar_berhasil.open = True
                 dosen.update()
@@ -268,7 +268,7 @@ class FormDosen(UserControl):
                 print(cursor.rowcount, "data di hapus!")
                 dosen.data_dosen.rows.clear()
                 
-                tampil_data(e)
+                tampil_data_dosen(e)
                 dosen.dialog.open = False
                 dosen.snack_bar_berhasil.open = True
                 dosen.update()
@@ -304,8 +304,8 @@ class FormDosen(UserControl):
                             DataCell(Text(row['alamat_dosen'])),
                         DataCell(
                             Row([
-                                IconButton("delete", icon_color = "red", data = row, ),
-                                IconButton("create", icon_color = "grey", data = row,),
+                                IconButton("delete", icon_color = "red", data = row, on_click = hapus_dosen ),
+                                IconButton("create", icon_color = "grey", data = row,on_click = tampil_dialog_ubah_dosen),
                             ])
                         ),
                     ]
