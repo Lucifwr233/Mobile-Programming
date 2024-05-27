@@ -2,6 +2,7 @@
 # import flet as ft
 import flet
 from flet import *
+import datetime
 import mysql.connector
 
 # buat koneksi ke database SQL
@@ -166,16 +167,53 @@ class FormMahasiswa(UserControl):
             #on_dismiss=bs_dismissed,
         )
     
-        return Column(
-            controls = [
-                Row([ElevatedButton("Tambah Data", icon = icons.ADD, icon_color="white", color = "white", bgcolor = "blue", on_click = tampil_dialog_mahasiswa)], alignment = MainAxisAlignment.END),
+       # buat variabel tampilan layout utama
+        mahasiswa.layout_utama = Column(
+            [
+                Container(
+                    Text(
+                        "Rekap Data Mahasiswa",
+                        size = 20,
+                        color = "blue",
+                        weight = FontWeight.BOLD,
+                    ),
+                    alignment = alignment.center,
+                    padding = 30,
+                ),
+                Container(
+                    ElevatedButton(
+                        "Tambah Data",
+                        icon = "ADD",
+                        icon_color = "white",
+                        color = "white",
+                        bgcolor = "blue",
+                        width = 200,
+                        on_click = tampil_dialog_mahasiswa,
+                    ),
+                    alignment = alignment.center,
+                    padding = 10,
+                ),
                 Row(
                     [mahasiswa.data_mahasiswa], scroll=ScrollMode.ALWAYS
                 ),
-                mahasiswa.dialog, mahasiswa.snack_bar_berhasil
-            ],
-            
+                mahasiswa.layout_data,
+                mahasiswa.snack_bar_berhasil,
+                mahasiswa.dialog,
+            ]
         )
+
+        return mahasiswa.layout_utama
+
+        # return Column(
+        #     controls = [
+        #         Row([ElevatedButton("Tambah Data", icon = icons.ADD, icon_color="white", color = "white", bgcolor = "blue", on_click = tampil_dialog_mahasiswa)], alignment = MainAxisAlignment.END),
+        #         Row(
+        #             [mahasiswa.data_mahasiswa], scroll=ScrollMode.ALWAYS
+        #         ),
+        #         mahasiswa.dialog, mahasiswa.snack_bar_berhasil
+        #     ],
+            
+        # )
 
 class FormMatakuliah(UserControl):
     # class untuk halaman mata kuliah
@@ -328,26 +366,79 @@ class FormMatakuliah(UserControl):
             #on_dismiss=bs_dismissed,
         )
     
-        return Column(
-            controls = [
-                Row([ElevatedButton("Tambah Data", icon = icons.ADD, icon_color="white", color = "white", bgcolor = "blue", on_click = tampil_dialog)], alignment = MainAxisAlignment.END),
+       # buat variabel tampilan layout utama
+        matakuliah.layout_utama = Column(
+            [
+                Container(
+                    Text(
+                        "Rekap Data Mata Kuliah",
+                        size = 19,
+                        color = "blue",
+                        weight = FontWeight.BOLD,
+                    ),
+                    alignment = alignment.center,
+                    padding = 30,
+                ),
+                Container(
+                    ElevatedButton(
+                        "Tambah Data",
+                        icon = "ADD",
+                        icon_color = "white",
+                        color = "white",
+                        bgcolor = "blue",
+                        width = 200,
+                        on_click = tampil_dialog,
+                    ),
+                    alignment = alignment.center,
+                    padding = 10,
+                ),
                 Row(
                     [matakuliah.data_matakuliah], scroll=ScrollMode.ALWAYS
                 ),
-                matakuliah.dialog, matakuliah.snack_bar_berhasil
-            ],
-            
+                matakuliah.layout_data,
+                matakuliah.snack_bar_berhasil,
+                matakuliah.dialog,
+            ]
         )
+
+        return matakuliah.layout_utama
+
+        # return Column(
+        #     controls = [
+        #         Row([ElevatedButton("Tambah Data", icon = icons.ADD, icon_color="white", color = "white", bgcolor = "blue", on_click = tampil_dialog)], alignment = MainAxisAlignment.END),
+        #         Row(
+        #             [matakuliah.data_matakuliah], scroll=ScrollMode.ALWAYS
+        #         ),
+        #         matakuliah.dialog, matakuliah.snack_bar_berhasil
+        #     ],
+            
+        # )
 
 class FormDosen(UserControl):
     # class untuk halaman mata kuliah
     def build(dosen) :
 
+        def ubah_tanggal_lhr(e):
+            tgl_baru = dosen.opsi_tanggal.value
+            dosen.inputan_tgl_lhr_dosen.value = tgl_baru.date()
+            dosen.update()
+            
+        def opsi_tanggal_lhr_dismissed(e):
+            tgl_baru = dosen.inputan_tgl_lhr_dosen.value
+            dosen.inputan_tgl_lhr_dosen.value = tgl_baru
+            dosen.update()
+        
+        dosen.opsi_tanggal = DatePicker(
+            on_change=ubah_tanggal_lhr,
+            on_dismiss=opsi_tanggal_lhr_dismissed,
+            first_date=datetime.datetime(2023, 10, 1),
+            last_date=datetime.datetime(2024, 10, 1),
+        )
         # buat variabel inputan
         dosen.inputan_id_dosen = TextField(visible = False, expand = True)
         dosen.inputan_nidn_dosen = TextField(label = "NIDN Dosen", hint_text = "masukkan NIDN Dosen ", expand = True)
         dosen.inputan_nama_dosen = TextField(label = "Nama Dosen", hint_text = "masukkan Nama Dosen ", expand = True)
-        dosen.inputan_jk_dosen = TextField(label = "Jk Dosen", hint_text = "Lk or PR ", expand = True)
+        dosen.inputan_jk_dosen = Dropdown(label = "Jk Dosen", hint_text = "Lk or PR ", expand = True, options=[dropdown.Option("Laki-laki"), dropdown.Option("Perempuan")],)
         dosen.inputan_tgl_lhr_dosen = TextField(label = "Tanggal lahir", hint_text = "Tgl Lahir", expand = True)
         dosen.inputan_alamat_dosen = TextField(label = "Alamat Dosen", hint_text = "Alamat", expand = True)
         dosen.snack_bar_berhasil = SnackBar( Text("Operasi berhasil"), bgcolor="green")
@@ -492,7 +583,7 @@ class FormDosen(UserControl):
                         Row([ dosen.inputan_nidn_dosen ]),
                         Row([ dosen.inputan_nama_dosen ]),
                         Row([ dosen.inputan_jk_dosen ]),
-                        Row([ dosen.inputan_tgl_lhr_dosen ]),
+                        Row([ dosen.inputan_tgl_lhr_dosen, FloatingActionButton(icon=icons.CALENDAR_MONTH, on_click=lambda _: dosen.opsi_tanggal.pick_date()) ]),
                         Row([ dosen.inputan_alamat_dosen ]),
                         Row([
                             #tombol tambah data
@@ -523,17 +614,42 @@ class FormDosen(UserControl):
             #on_dismiss=bs_dismissed,
         )
 
-
-        return Column(
-            controls = [
-                Row([ElevatedButton("Tambah Data", icon = icons.ADD, icon_color="white", color = "white", bgcolor = "blue", on_click = tampil_dialog_dosen)], alignment = MainAxisAlignment.END),
+   # buat variabel tampilan layout utama
+        dosen.layout_utama = Column(
+            [
+                Container(
+                    Text(
+                        "Rekap Data Dosen",
+                        size = 25,
+                        color = "blue",
+                        weight = FontWeight.BOLD,
+                    ),
+                    alignment = alignment.center,
+                    padding = 30,
+                ),
+                Container(
+                    ElevatedButton(
+                        "Tambah Data",
+                        icon = "ADD",
+                        icon_color = "white",
+                        color = "white",
+                        bgcolor = "blue",
+                        width = 200,
+                        on_click = tampil_dialog_dosen,
+                    ),
+                    alignment = alignment.center,
+                    padding = 10,
+                ),
                 Row(
                     [dosen.data_dosen], scroll=ScrollMode.ALWAYS
                 ),
-                dosen.dialog, dosen.snack_bar_berhasil
-            ],
-            
+                dosen.layout_data,
+                dosen.snack_bar_berhasil,
+                dosen.dialog,
+            ]
         )
+
+        return dosen.layout_utama
 
 # fungsi utama
 def main (page : Page):
