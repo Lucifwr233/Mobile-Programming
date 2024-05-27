@@ -141,7 +141,7 @@ class FormMatakuliah(UserControl):
                                     icon_color = "white",
                                     color = "white",
                                     bgcolor = "teal",
-                                    width = 280,
+                                    width = 250,
                                     height = 50,
                                     on_click = simpan_matakuliah,
                                 )
@@ -301,7 +301,7 @@ class FormDosen(UserControl):
                         DataCell(
                             Row([
                                 IconButton("delete", icon_color = "red", data = row, on_click = hapus_dosen ),
-                                IconButton("create", icon_color = "grey", data = row,on_click = tampil_dialog_ubah_dosen),
+                                IconButton("create", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_dosen),
                             ])
                         ),
                     ]
@@ -332,7 +332,7 @@ class FormDosen(UserControl):
                                     color = "white",
                                     bgcolor = "teal",
                                     width =  250,
-                                    height = 100,
+                                    height = 50,
                                     on_click = simpan_dosen,
                                 )
                         ]),
