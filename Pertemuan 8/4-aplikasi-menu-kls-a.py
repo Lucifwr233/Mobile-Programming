@@ -401,6 +401,7 @@ def main (page : Page):
                                 controls = [
                                     ElevatedButton("Menu Mata Kuliah", icon = icons.TABLE_ROWS, icon_color="black", color = "black", on_click = lambda _: page.go("/matakuliah")),
                                     ElevatedButton("Menu Dosen", icon = icons.PEOPLE_ROUNDED, icon_color="black", color = "black", on_click = lambda _: page.go("/dosen")),
+                                    ElevatedButton("Menu Mahasiswa", icon = icons.PEOPLE_ROUNDED, icon_color="black", color = "black", on_click = lambda _: page.go("/mahasiswa")),
                                     ElevatedButton("Menu Jadwal Kuliah", icon = icons.SCHEDULE_ROUNDED, icon_color="black", color = "black", on_click = lambda _: page.go("/jadwalkuliah")),
                                 ],
                                 width = 375,
