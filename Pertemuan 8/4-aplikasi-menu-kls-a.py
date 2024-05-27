@@ -646,6 +646,7 @@ class FormDosen(UserControl):
                 dosen.layout_data,
                 dosen.snack_bar_berhasil,
                 dosen.dialog,
+                dosen.opsi_tanggal
             ]
         )
 
