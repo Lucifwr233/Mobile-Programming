@@ -236,14 +236,10 @@ class FormDosen(UserControl):
             try:
                 if (dosen.inputan_id_dosen.value == '') :
                     sql = "INSERT INTO dosen (id_dosen, nidn_dosen, nama_dosen, jk_dosen, tgl_lahir_dosen, alamat_dosen) VALUES(%s, %s, %s, %s, %s, %s)"
-                    val = ('', dosen.inputan_nidn_dosen.value)
-                    val = ('', dosen.inputan_nama_dosen.value)
-                    val = ('', dosen.inputan_jk_dosen.value)
-                    val = ('', dosen.inputan_tgl_lhr_dosen.value)
-                    val = ('', dosen.inputan_alamat_dosen.value)
+                    val = (dosen.inputan_id_dosen.value, dosen.inputan_nidn_dosen.value, dosen.inputan_nama_dosen.value, dosen.inputan_jk_dosen.value, dosen.inputan_tgl_lhr_dosen.value, dosen.inputan_alamat_dosen.value)
                 else :
-                    sql = "UPDATE dosen SET nidn_dosen, nama_dosen, jk_dosen, tgl_lahir_dosen, alamat_dosen = %s %s %s %s %s WHERE id_dosen = %s"
-                    val = (dosen.inputan_nidn_dosen.value, dosen.inputan_nidn_dosen.value, dosen.inputan_nama_dosen.value, dosen.inputan_jk_dosen.value, dosen.inputan_tgl_lhr_dosen.value, dosen.inputan_alamat_dosen.value)
+                    sql = "UPDATE dosen SET nidn_dosen = %s, nama_dosen = %s, jk_dosen = %s, tgl_lahir_dosen = %s, alamat_dosen = %s WHERE id_dosen = %s"
+                    val = (dosen.inputan_nidn_dosen.value, dosen.inputan_nama_dosen.value, dosen.inputan_jk_dosen.value, dosen.inputan_tgl_lhr_dosen.value, dosen.inputan_alamat_dosen.value,  dosen.inputan_id_dosen.value)
                     
                 cursor.execute(sql, val)
                 koneksi_db.commit()
