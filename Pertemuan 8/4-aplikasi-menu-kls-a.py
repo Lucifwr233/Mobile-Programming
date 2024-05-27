@@ -140,7 +140,7 @@ class FormMatakuliah(UserControl):
                                     icon = "SAVE_AS",
                                     icon_color = "white",
                                     color = "white",
-                                    bgcolor = "teal",
+                                    bgcolor = "blue",
                                     width = 250,
                                     height = 50,
                                     on_click = simpan_matakuliah,
@@ -162,7 +162,7 @@ class FormMatakuliah(UserControl):
     
         return Column(
             controls = [
-                Row([ElevatedButton("Tambah Data", icon = icons.ADD, icon_color="white", color = "white", bgcolor = "teal", on_click = tampil_dialog)], alignment = MainAxisAlignment.END),
+                Row([ElevatedButton("Tambah Data", icon = icons.ADD, icon_color="white", color = "white", bgcolor = "blue", on_click = tampil_dialog)], alignment = MainAxisAlignment.END),
                 matakuliah.data_matakuliah, matakuliah.dialog, matakuliah.snack_bar_berhasil
             ],
             
@@ -330,7 +330,7 @@ class FormDosen(UserControl):
                                     icon = "SAVE_AS",
                                     icon_color = "white",
                                     color = "white",
-                                    bgcolor = "teal",
+                                    bgcolor = "blue",
                                     width =  250,
                                     height = 50,
                                     on_click = simpan_dosen,
@@ -356,7 +356,7 @@ class FormDosen(UserControl):
 
         return Column(
             controls = [
-                Row([ElevatedButton("Tambah Data", icon = icons.ADD, icon_color="white", color = "white", bgcolor = "teal", on_click = tampil_dialog_dosen)], alignment = MainAxisAlignment.END),
+                Row([ElevatedButton("Tambah Data", icon = icons.ADD, icon_color="white", color = "white", bgcolor = "blue", on_click = tampil_dialog_dosen)], alignment = MainAxisAlignment.END),
                 Row(
                     [dosen.data_dosen], scroll=ScrollMode.ALWAYS
                 ),
@@ -391,15 +391,12 @@ def main (page : Page):
                 [
                     AppBar(
                         title = Text("Aplikasi CRUD Jadwal Kuliah", size = 18, weight = FontWeight.BOLD, color = colors.WHITE), 
-                        bgcolor = colors.TEAL, 
+                        bgcolor = colors.BLUE, 
                         center_title = True,
-                        actions = [
-                            IconButton(icons.WB_SUNNY_OUTLINED, on_click = mode_tema),
-                        ],
                     ),
                     Column(
                         [
-                            Icon(name = icons.CALENDAR_MONTH_ROUNDED, color = colors.TEAL, size = 180),
+                            Icon(name = icons.CALENDAR_MONTH_ROUNDED, color = colors.BLUE, size = 180),
                             Column(
                                 controls = [
                                     ElevatedButton("Menu Mata Kuliah", icon = icons.TABLE_ROWS, icon_color="black", color = "black", on_click = lambda _: page.go("/matakuliah")),
@@ -415,6 +412,17 @@ def main (page : Page):
                         width = 375,
                         alignment = MainAxisAlignment.SPACE_AROUND,
                         horizontal_alignment = CrossAxisAlignment.CENTER,
+                    ),
+                    Column(
+                        [
+                            Column(
+                                controls = [
+                                    ElevatedButton("Mode Gelap", icon = icons.WB_SUNNY_OUTLINED, icon_color="black", color = "black", on_click = mode_tema),
+                                ],
+                                width = 375,
+                                horizontal_alignment = CrossAxisAlignment.CENTER,
+                            ),
+                        ],
                     ),
                     
                 ],
