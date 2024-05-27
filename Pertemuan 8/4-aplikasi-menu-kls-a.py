@@ -8,6 +8,175 @@ import mysql.connector
 koneksi_db = mysql.connector.connect(host = "localhost", user = "root", password = "", database = "mp_appcrudsql")
 cursor = koneksi_db.cursor()
 
+class FormMahasiswa(UserControl):
+    # class untuk halaman mata kuliah
+    def build(mahasiswa) :
+
+        # buat variabel inputan
+        mahasiswa.inputan_id_mahasiswa = TextField(visible = False, expand = True)
+        mahasiswa.inputan_nama_mhs = TextField(label = "Nama", hint_text = "Nama ", expand = True)
+        mahasiswa.inputan_age_mhs = TextField(label = "Umur", hint_text = "Umur", expand = True)
+        mahasiswa.snack_bar_berhasil = SnackBar( Text("Operasi berhasil"), bgcolor="green")
+        
+        # memuat tabel data
+        def tampil_data_mahasiswa(e):
+            # Merefresh halaman & menampilkan notif
+            mahasiswa.data_mahasiswa.rows.clear()
+            cursor.execute("SELECT * FROM mahasiswa")
+            result = cursor.fetchall()
+            # menampilkan ulang data 
+            columns = [column[0] for column in cursor.description]
+            rows = [dict(zip(columns,row)) for row in result]
+            for row in rows:
+                mahasiswa.data_mahasiswa.rows.append(
+                    DataRow(
+                        cells = [
+                            DataCell(Text(row['id'])),
+                            DataCell(Text(row['name'])),
+                            DataCell(Text(row['age'])),
+                            DataCell(
+                                Row([
+                                    IconButton("delete", icon_color = "red", data = row, on_click = hapus_mahasiswa),
+                                    IconButton("create", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_mahasiswa),
+                                ])
+                            ),
+                        ]
+                        )
+                    )
+        # fungsi menampilkan dialog form entri
+        def tampil_dialog_mahasiswa(e):
+            mahasiswa.inputan_id_mahasiswa.value = ''
+            mahasiswa.inputan_nama_mhs.value = ''
+            mahasiswa.inputan_age_mhs.value = ''
+            mahasiswa.dialog.open = True
+            mahasiswa.update()
+
+        def tampil_dialog_ubah_mahasiswa(e):
+            mahasiswa.inputan_id_mahasiswa.value = e.control.data['id']
+            mahasiswa.inputan_nama_mhs.value = e.control.data['name']
+            mahasiswa.inputan_age_mhs.value = e.control.data['age']
+            mahasiswa.dialog.open = True
+            mahasiswa.update()
+
+        # fungsi simpan data
+        def simpan_mahasiswa(e):
+            try:
+                if (mahasiswa.inputan_id_mahasiswa.value == '') :
+                    sql = "INSERT INTO mahasiswa (name, age) VALUES(%s, %s)"
+                    val = (mahasiswa.inputan_nama_mhs.value, mahasiswa.inputan_age_mhs.value)
+                else :
+                    sql = "UPDATE mahasiswa SET name = %s, age = %s WHERE id = %s"
+                    val = (mahasiswa.inputan_nama_mhs.value, mahasiswa.inputan_age_mhs.value, mahasiswa.inputan_id_mahasiswa.value)
+                    
+                cursor.execute(sql, val)
+                koneksi_db.commit()
+                print(cursor.rowcount, "Data di simpan!")
+
+                tampil_data_mahasiswa(e)
+                mahasiswa.dialog.open = False
+                mahasiswa.snack_bar_berhasil.open = True
+                mahasiswa.update()
+            except Exception as e:
+                print(e)
+                print("Ada yang error!")
+
+        # fungsi hapus data
+        def hapus_mahasiswa(e):
+            try:
+                sql = "DELETE FROM mahasiswa WHERE id = %s"
+                val = (e.control.data['id'],)
+                cursor.execute(sql, val)
+                koneksi_db.commit()
+                print(cursor.rowcount, "data di hapus!")
+                mahasiswa.data_mahasiswa.rows.clear()
+                
+                tampil_data_mahasiswa(e)
+                mahasiswa.dialog.open = False
+                mahasiswa.snack_bar_berhasil.open = True
+                mahasiswa.update()
+            except Exception as e:
+                print(e)
+                print("Ada yang error!")
+
+        # menampilkan semua data ke dalam tabel
+        cursor.execute("SELECT * FROM mahasiswa")
+        result = cursor.fetchall()
+        columns = [column[0] for column in cursor.description]
+        rows = [dict(zip(columns,row)) for row in result]
+        mahasiswa.data_mahasiswa = DataTable(
+            columns = [
+                DataColumn(Text("ID")),
+                DataColumn(Text("Nama")),
+                DataColumn(Text("Umur")),
+                DataColumn(Text("Opsi")),
+            ],
+        )
+        for row in rows:
+            mahasiswa.data_mahasiswa.rows.append(
+                DataRow(
+                    cells = [
+                        DataCell(Text(row['id'])),
+                        DataCell(Text(row['name'])),
+                        DataCell(Text(row['age'])),
+                        DataCell(
+                            Row([
+                                IconButton("delete", icon_color = "red", data = row, on_click = hapus_mahasiswa),
+                                IconButton("create", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_mahasiswa),
+                            ])
+                        ),
+                    ]
+                )
+            )
+        
+        # buat variabel utk layout data rekapan
+        mahasiswa.layout_data = Column()
+
+        # buat form dialog untuk form entri data
+        mahasiswa.dialog = BottomSheet(
+            Container(
+                Column(
+                    [
+                        Text("Form Entri Mahasiswa", weight = FontWeight.BOLD),
+                        Row([ mahasiswa.inputan_id_mahasiswa ]),
+                        Row([ mahasiswa.inputan_nama_mhs ]),
+                        Row([ mahasiswa.inputan_age_mhs ]),
+                        Row([
+                            #tombol tambah data
+                            ElevatedButton(
+                                "Simpan Data",
+                                    icon = "SAVE_AS",
+                                    icon_color = "white",
+                                    color = "white",
+                                    bgcolor = "blue",
+                                    width = 250,
+                                    height = 50,
+                                    on_click = simpan_mahasiswa,
+                                )
+                        ]),
+                    ],
+                    horizontal_alignment = CrossAxisAlignment.CENTER,
+                    height = 500
+                    #tight = True,
+                ),
+                padding = 40,
+                width = 378,
+                height = 500
+            ),
+            open = False,
+            #on_dismiss=bs_dismissed,
+        )
+    
+        return Column(
+            controls = [
+                Row([ElevatedButton("Tambah Data", icon = icons.ADD, icon_color="white", color = "white", bgcolor = "blue", on_click = tampil_dialog_mahasiswa)], alignment = MainAxisAlignment.END),
+                Row(
+                    [mahasiswa.data_mahasiswa], scroll=ScrollMode.ALWAYS
+                ),
+                mahasiswa.dialog, mahasiswa.snack_bar_berhasil
+            ],
+            
+        )
+
 class FormMatakuliah(UserControl):
     # class untuk halaman mata kuliah
     def build(matakuliah) :
@@ -156,14 +325,16 @@ class FormMatakuliah(UserControl):
                 height = 500
             ),
             open = False,
-            bgcolor = colors.GREY_50
             #on_dismiss=bs_dismissed,
         )
     
         return Column(
             controls = [
                 Row([ElevatedButton("Tambah Data", icon = icons.ADD, icon_color="white", color = "white", bgcolor = "blue", on_click = tampil_dialog)], alignment = MainAxisAlignment.END),
-                matakuliah.data_matakuliah, matakuliah.dialog, matakuliah.snack_bar_berhasil
+                Row(
+                    [matakuliah.data_matakuliah], scroll=ScrollMode.ALWAYS
+                ),
+                matakuliah.dialog, matakuliah.snack_bar_berhasil
             ],
             
         )
@@ -349,7 +520,6 @@ class FormDosen(UserControl):
                 height = 500
             ),
             open = False,
-            bgcolor = colors.GREY_50
             #on_dismiss=bs_dismissed,
         )
 
@@ -376,11 +546,11 @@ def main (page : Page):
     page.window_minimizable = True
     page.scroll = "adaptive"
     #page.theme_mode = "light"
-    page.theme_mode = ThemeMode.LIGHT
+    page.theme_mode = ThemeMode.DARK
 
     # fungsi untuk mode halaman dark/light
     def mode_tema(e):
-        page.theme_mode = "light" if page.theme_mode =="dark" else "dark"
+        page.theme_mode = "dark" if page.theme_mode =="light" else "light"
         page.update()
 
     # fungsi untuk routing / pembagian halaman
@@ -396,18 +566,18 @@ def main (page : Page):
                     ),
                     Column(
                         [
-                            Icon(name = icons.CALENDAR_MONTH_ROUNDED, color = colors.BLUE, size = 180),
+                            Icon(name = icons.CAST_FOR_EDUCATION, color = colors.BLUE, size = 180),
                             Column(
                                 controls = [
-                                    ElevatedButton("Menu Mata Kuliah", icon = icons.TABLE_ROWS, icon_color="black", color = "black", on_click = lambda _: page.go("/matakuliah")),
-                                    ElevatedButton("Menu Dosen", icon = icons.PEOPLE_ROUNDED, icon_color="black", color = "black", on_click = lambda _: page.go("/dosen")),
-                                    ElevatedButton("Menu Mahasiswa", icon = icons.PEOPLE_ROUNDED, icon_color="black", color = "black", on_click = lambda _: page.go("/mahasiswa")),
-                                    ElevatedButton("Menu Jadwal Kuliah", icon = icons.SCHEDULE_ROUNDED, icon_color="black", color = "black", on_click = lambda _: page.go("/jadwalkuliah")),
+                                    ElevatedButton("Menu Mata Kuliah", icon = icons.TABLE_ROWS, on_click = lambda _: page.go("/matakuliah")),
+                                    ElevatedButton("Menu Dosen", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/dosen")),
+                                    ElevatedButton("Menu Mahasiswa", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/mahasiswa")),
+                                    ElevatedButton("Menu Jadwal Kuliah", icon = icons.SCHEDULE_ROUNDED, on_click = lambda _: page.go("/jadwalkuliah"), disabled=True),
                                 ],
                                 width = 375,
                                 horizontal_alignment = CrossAxisAlignment.CENTER,
                             ),
-                            Text('Mobile Programming @2024', size = 12)
+
                         ],
                         height = 500,
                         width = 375,
@@ -418,17 +588,28 @@ def main (page : Page):
                         [
                             Column(
                                 controls = [
-                                    ElevatedButton("Mode Gelap", icon = icons.WB_SUNNY_OUTLINED, icon_color="black", color = "black", on_click = mode_tema),
+                                    ElevatedButton("Mode Warna", icon = icons.WB_SUNNY_OUTLINED, on_click = mode_tema),
                                 ],
                                 width = 375,
                                 horizontal_alignment = CrossAxisAlignment.CENTER,
                             ),
+                            Text('Mobile Programming @2024', size = 12)
                         ],
+                        horizontal_alignment = CrossAxisAlignment.CENTER,
                     ),
                     
                 ],
             )
         )
+        if page.route == "/mahasiswa":
+            page.views.append(
+                View("/mahasiswa",
+                    [
+                        AppBar(title = Text("Menu Mahasiswa", size = 14, weight = FontWeight.BOLD), bgcolor = colors.SURFACE_VARIANT),
+                        FormMahasiswa()
+                    ],
+                )
+            )
         if page.route == "/matakuliah":
             page.views.append(
                 View("/matakuliah",
