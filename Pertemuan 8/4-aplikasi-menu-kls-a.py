@@ -424,11 +424,11 @@ class FormJadwal(UserControl):
         jadwal.inputan_jam_kuliah = TextField(label = "Jam Kuliah", hint_text = "masukkan Jam ", expand = True)
         jadwal.inputan_ruang_kuliah = TextField(label = "Ruang", hint_text = "masukkan Ruang ", expand = True)
         # id Dosen
-        txtdosen = cursor.execute("SELECT id_dosen, nidn_dosen from dosen")
-        jadwal.inputan_id_dosen = Dropdown(hint_text = "ID Dosen", expand = True, options=[dropdown.Option(row[0],row[1]) for row in cursor.fetchall()])
+        txtdosen = cursor.execute("SELECT * FROM dosen")
+        jadwal.inputan_id_dosen = Dropdown(hint_text = "ID Dosen", expand = True, options=[dropdown.Option(row[0],row[1] + " - " + row[2]) for row in cursor.fetchall()])
         
-        cursor.execute("SELECT id_matakuliah, mata_kuliah from mata_kuliah")
-        jadwal.inputan_id_matakuliah = Dropdown(hint_text = "ID Makul", expand = True, options=[dropdown.Option(row[0],row[1]) for row in cursor.fetchall()])
+        cursor.execute("SELECT * FROM mata_kuliah")
+        jadwal.inputan_id_matakuliah = Dropdown(hint_text = "ID Makul", expand = True, options=[dropdown.Option(row[0]) for row in cursor.fetchall()])
         jadwal.snack_bar_berhasil = SnackBar( Text("Operasi berhasil"), bgcolor="green")
 
         # memuat tabel data
