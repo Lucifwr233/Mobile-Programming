@@ -1,246 +1,55 @@
-#memasukkan library flet ke aplikasi
-#import flet as ft
-import datetime
+# memasukkan library flet ke aplikasi
+# import flet as ft
 import flet
 from flet import *
+import datetime
 import mysql.connector
 
-# CONECTION TO DB
-mydb = mysql.connector.connect(
-	host = "localhost",
-	user = "root",
-	password = "",
-	database = "fattah_crud_mobile"
-)
-cursor = mydb.cursor()
+# buat koneksi ke database SQL
+koneksi_db = mysql.connector.connect(host = "localhost", user = "root", password = "", database = "fattah_crud_mobile")
+cursor = koneksi_db.cursor()
 
-#buat class form entri crud
-class FormCrud(UserControl) :
-    def build(crud) :
-        #buat variabel untuk inputan crud
-        crud.inputan_nama = TextField(
-            border_color= "grey",
-            label  = "Nama",
-            hint_text = "Nama",
-            autofocus=True,
-            expand = True
-        )
+class FormMember(UserControl):
+    # class untuk halaman mata kuliah
+    def build(member) :
 
-        #buat variabel untuk inputan crud2
-        crud.inputan_jekel = Dropdown(
-            border_color= "grey",
-            hint_text = "Jenis Kelamin",
-            expand = True,
-            label="Jenis Kelamin",
-            options=[
-               dropdown.Option("Laki-Laki"),
-               dropdown.Option("Perempuan"),
-            ],
-        )
-
-        #buat variabel inputan tanggal lahir
-        def ubah_tanggal_lahir(e):
-            tgl_baru = crud.opsi_tanggal.value
-            crud.inputan_tgl.value = tgl_baru.date()
-            crud.update()
-
-        def opsi_tanggal_lahir_dismissed(e):
-            tgl_baru = crud.inputan_tgl.value
-            crud.inputan_tgl.value = tgl_baru
-            crud.update()
-
-        crud.opsi_tanggal = DatePicker(
-            on_change= ubah_tanggal_lahir,
-            on_dismiss= opsi_tanggal_lahir_dismissed,
-            first_date= datetime.datetime (1945, 1, 1),
-            last_date= datetime.date.today(),
-        )
-
-        crud.inputan_tgl = TextField(
-            border_color= "grey",
-            label = "Tanggal Lahir",
-            hint_text = "Tanggal Lahir",
-            read_only = True,
-            expand = True
-        )
-
-        #buat variabel inputan tanggal gabung member
-        crud.inputan_tgl_member = TextField(
-            border_color= "grey",
-            label= "Tanggal Gabung Member",
-            hint_text = "Tanggal Gabung Member",
-            read_only = True,
-            expand = True
-        )
-
-        def ubah_tanggal_member(e):
-            tgl_baru = crud.opsi_tanggal_member.value
-            crud.inputan_tgl_member.value = tgl_baru.date()
-            crud.update()
-
-        def opsi_tanggal_member_dismissed(e):
-            tgl_baru = crud.inputan_tgl_member.value
-            crud.inputan_tgl_member.value = tgl_baru
-            crud.update()
-
-        crud.opsi_tanggal_member = DatePicker(
-            on_change= ubah_tanggal_member,
-            on_dismiss= opsi_tanggal_member_dismissed,
-            first_date= datetime.datetime (1945, 1, 1),
-            last_date= datetime.date.today(),
-        )
-
-        crud.inputan_alamat = TextField(
-            border_color= "grey",
-            label= "Alamat",
-            multiline= True,
-            hint_text = "Alamat",
-            max_lines= 3,
-            expand = True
-        )
-
-        crud.inputan_telp = TextField(
-            border_color= "grey",
-            label= "No Telepon",
-            multiline= True,
-            hint_text = "No Telepon",
-            max_lines= 3,
-            expand = True
-        )
-
-        #buat notif snackbar
-        crud.snack_bar = SnackBar(
-            content= Text("Silahkan isi terlebih dahulu!"),
-            bgcolor= colors.RED,
-            close_icon_color= colors.WHITE,
-            show_close_icon= True
-        )
-
-        crud.data_member = DataTable(
-            columns=[
-                DataColumn(Text("ID")),
-                DataColumn(Text("Nama")),
-                DataColumn(Text("Jenis Kelamin")),
-                DataColumn(Text("Tanggal Lahir")),
-                DataColumn(Text("Alamat")),
-                DataColumn(Text("Telepon")),
-                DataColumn(Text("Tanggal Gabung Member")),
-            ],
-            rows= []
-        )
-
-        #buat variabel utk layout data rekapan
-        crud.layout_data = Column(
+        def ubah_tanggal_lhr(e):
+            tgl_baru = member.opsi_tanggal.value
+            member.inputan_tgl_lahir.value = tgl_baru.date()
+            member.update()
             
+        def opsi_tanggal_lhr_dismissed(e):
+            tgl_baru = member.inputan_tgl_lahir.value
+            member.inputan_tgl_lhr_member.value = tgl_baru
+            member.update()
+        
+        member.opsi_tanggal = DatePicker(
+            on_change=ubah_tanggal_lhr,
+            on_dismiss=opsi_tanggal_lhr_dismissed,
+            first_date=datetime.datetime(2023, 10, 1),
+            last_date=datetime.datetime(2024, 10, 1),
         )
+        # buat variabel inputan
+        member.inputan_id = TextField(visible = False, expand = True)
+        member.inputan_nama = TextField(label = "NIDN Dosen", hint_text = "masukkan NIDN Dosen ", expand = True)
+        member.inputan_jekel = Dropdown(label = "Jk", hint_text = "Lk or PR ", expand = True, options=[dropdown.Option("Laki-laki"), dropdown.Option("Perempuan")],)
+        member.inputan_tgl_lahir = TextField(label = "Tanggal lahir", hint_text = "Tgl Lahir", expand = True)
+        member.inputan_alamat = TextField(label = "Alamat Member", hint_text = "Alamat", expand = True)
+        member.inputan_telp = TextField(label = "Telepon", hint_text = "Telepon", expand = True)
+        member.inputan_tgl_member = TextField(label = "Tanggal Member", hint_text = "Tanggal Member", expand = True)
+        member.snack_bar_berhasil = SnackBar( Text("Operasi berhasil"), bgcolor="green")
 
-        return Column(
-            controls = [
-                Row(
-                controls = [
-                    #field / inputan crud
-                    crud.inputan_nama, 
-                ]
-            ),
-
-                Row(
-                controls = [
-                    crud.inputan_jekel,
-                    ]
-                ),
-                Row(
-                controls = [
-                    crud.inputan_tgl,
-                     crud.opsi_tanggal,
-                    FloatingActionButton(
-                        "Pick date",
-                        bgcolor = "blue",
-                        icon=icons.CALENDAR_MONTH_ROUNDED,
-                        on_click=lambda _: crud.opsi_tanggal.pick_date(),
-                    )
-                  ]
-                ),
-
-                Row(
-                controls = [
-                    crud.inputan_alamat,
-                    ]
-                ),
-
-                Row(
-                controls = [
-                    crud.inputan_telp,
-                    ]
-                ),
-
-                Row(
-                controls = [
-                    crud.inputan_tgl_member,
-                     crud.opsi_tanggal_member,
-                    FloatingActionButton(
-                        "Pick date",
-                        bgcolor = "blue",
-                        icon=icons.CALENDAR_MONTH_ROUNDED,
-                        on_click=lambda _: crud.opsi_tanggal_member.pick_date(),
-                    )
-                  ]
-                ),
-
-            Row(
-                controls = [
-                    #tombol tambah data 
-                    FloatingActionButton( 
-                        icon = icons.ADD,
-                        text=("Tambah Data"),
-                        bgcolor = "blue",
-                        width = 340,
-                        on_click= crud.simpan_data_baru,
-                    )
-                    ]
-                ),
-
-            #layout rekapan data
-            crud.layout_data,
-            #tanggal
-            crud.opsi_tanggal,
-            ]  
-        )
-
-            # DELETE FUNCTION
-        def hapus_data(e):
-            print("you selected id is = ", e.control.data['id'])
-            try:
-                sql = "DELETE FROM membership WHERE id = %s"
-                val = (e.control.data['id'],)
-                cursor.execute(sql, val)
-                mydb.commit()
-                print("you deleted !")
-                data_mahasiswa.rows.clear()
-                tampil_data_mahasiswa()
-
-                # AND SHOW SNACKBAR
-                page.snack_bar = SnackBar(
-                    Text("Data success Deleted",size = 30),
-                    bgcolor = "red"
-                )
-                page.snack_bar.open = True
-                page.update()
-            except Exception as e:
-                print(e)
-                print("error you code for delete")
-
-        def tampil_data_member():
-            # GET ALL DATA FROM DATABASE AND PUSH TO DATATABLE
+        # memuat tabel data
+        def tampil_member(e):
+            # Merefresh halaman & menampilkan notif
+            member.data_member.rows.clear()
             cursor.execute("SELECT * FROM membership")
             result = cursor.fetchall()
-
-            # AND PUSH DATA TO DICT
+            # menampilkan ulang data 
             columns = [column[0] for column in cursor.description]
             rows = [dict(zip(columns,row)) for row in result]
-
-            # LOOP AND PUSH
             for row in rows:
-                data_member.rows.append(
+                member.data_member.rows.append(
                     DataRow(
                         cells = [
                             DataCell(Text(row['id'])),
@@ -252,128 +61,303 @@ class FormCrud(UserControl) :
                             DataCell(Text(row['tgl_member'])),
                             DataCell(
                                 Row([
-                                    IconButton("delete",icon_color = "red",
-                                        data = row,
-                                        on_click = hapus_data
-                                    ),
-                                    IconButton("create",icon_color = "red",
-                                        data = row,
-                                        on_click = tampil_ubah_data
-                                    ),
+                                    IconButton("delete", icon_color = "red", data = row, ),
+                                    IconButton("create", icon_color = "grey", data = row, ),
                                 ])
                             ),
                         ]
+                        )
                     )
 
+        # fungsi menampilkan dialog form entri
+        def tampil_dialog_member(e):
+            member.inputan_id.value = ''
+            member.inputan_nama.value = ''
+            member.inputan_jekel.value = ''
+            member.inputan_tgl_lahir.value = ''
+            member.inputan_alamat.value = ''
+            member.inputan_telp.value = ''
+            member.inputan_tgl_member.value = ''
+            member.dialog.open = True
+            member.update()
+
+        def tampil_dialog_ubah_member(e):
+            member.inputan_id.value = e.control.data['id']
+            member.inputan_nama.value = e.control.data['nama']
+            member.inputan_jekel.value = e.control.data['jekel']
+            member.inputan_tgl_lahir.value = e.control.data['tgl_lahir']
+            member.inputan_alamat.value = e.control.data['alamat']
+            member.inputan_telp.value = e.control.data['telp']
+            member.inputan_tgl_member.value = e.control.data['tgl_member']
+            member.dialog.open = True
+            member.update()
+
+        # fungsi simpan data
+        def simpan_member(e):
+            try:
+                if (dosen.inputan_id_dosen.value == '') :
+                    sql = "INSERT INTO membership (id_dosen, nidn_dosen, nama_dosen, jk_dosen, tgl_lahir_dosen, alamat_dosen) VALUES(%s, %s, %s, %s, %s, %s)"
+                    val = (dosen.inputan_id_dosen.value, dosen.inputan_nidn_dosen.value, dosen.inputan_nama_dosen.value, dosen.inputan_jk_dosen.value, dosen.inputan_tgl_lhr_dosen.value, dosen.inputan_alamat_dosen.value)
+                else :
+                    sql = "UPDATE dosen SET nidn_dosen = %s, nama_dosen = %s, jk_dosen = %s, tgl_lahir_dosen = %s, alamat_dosen = %s WHERE id_dosen = %s"
+                    val = (dosen.inputan_nidn_dosen.value, dosen.inputan_nama_dosen.value, dosen.inputan_jk_dosen.value, dosen.inputan_tgl_lhr_dosen.value, dosen.inputan_alamat_dosen.value,  dosen.inputan_id_dosen.value)
+                    
+                cursor.execute(sql, val)
+                koneksi_db.commit()
+                print(cursor.rowcount, "Data di simpan!")
+
+                tampil_data_dosen(e)
+                dosen.dialog.open = False
+                dosen.snack_bar_berhasil.open = True
+                dosen.update()
+            except Exception as e:
+                print(e)
+                print("Ada yang error!")
+
+
+        # fungsi hapus data
+        def hapus_dosen(e):
+            try:
+                sql = "DELETE FROM dosen WHERE id_dosen = %s"
+                val = (e.control.data['id_dosen'],)
+                cursor.execute(sql, val)
+                koneksi_db.commit()
+                print(cursor.rowcount, "data di hapus!")
+                dosen.data_dosen.rows.clear()
+                
+                tampil_data_dosen(e)
+                dosen.dialog.open = False
+                dosen.snack_bar_berhasil.open = True
+                dosen.update()
+            except Exception as e:
+                print(e)
+                print("Ada yang error!")
+
+        # menampilkan semua data ke dalam tabel
+        cursor.execute("SELECT * FROM dosen")
+        result = cursor.fetchall()
+        columns = [column[0] for column in cursor.description]
+        rows = [dict(zip(columns,row)) for row in result]
+        dosen.data_dosen = DataTable(
+            columns = [
+                DataColumn(Text("ID Dosen")),
+                DataColumn(Text("NIDN")),
+                DataColumn(Text("Nama")),
+                DataColumn(Text("JK")),
+                DataColumn(Text("Tanggal Lahir")),
+                DataColumn(Text("Alamat")),
+                DataColumn(Text("Opsi")),
+            ],
+        )
+        for row in rows:
+            dosen.data_dosen.rows.append(
+                DataRow(
+                    cells = [
+                            DataCell(Text(row['id_dosen'])),
+                            DataCell(Text(row['nidn_dosen'])),
+                            DataCell(Text(row['nama_dosen'])),
+                            DataCell(Text(row['jk_dosen'])),
+                            DataCell(Text(row['tgl_lahir_dosen'])),
+                            DataCell(Text(row['alamat_dosen'])),
+                        DataCell(
+                            Row([
+                                IconButton("delete", icon_color = "red", data = row, on_click = hapus_dosen ),
+                                IconButton("create", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_dosen),
+                            ])
+                        ),
+                    ]
                 )
-            page.update()
-            # calling data from database when app open for the first time
-            tampil_data_member()
+            )
 
-            def simpan_data_baru(e):
-                try:
-                    sql = "INSERT INTO membership (nama,jekel,tgl_lahir,alamat,telp,tgl_member) VALUES(%s,%s)"
-                    val = (crud.inputan_nama.value,crud.inputan_jekel.value,crud.inputan_tgl.value,crud.inputan_alamat.value,crud.inputan_telp.value,crud.inputan_tgl_member.value)
-                    cursor.execute(sql,val)
-                    mydb.commit()
-                    print(cursor.rowcount,"YOU RECORD INSERT !!!")
+        # buat variabel utk layout data rekapan
+        dosen.layout_data = Column()
 
-                    # AND CLEAR ROWS IN TABLE AND PUSH FROM DATABASE AGAIN
-                    data_member.rows.clear()
-                    tampil_data_member()
+        # buat form dialog untuk form entri data
+        dosen.dialog = BottomSheet(
+            Container(
+                Column(
+                    [
+                        Text("Form Entri Data Dosen", weight = FontWeight.BOLD),
+                        Row([ dosen.inputan_id_dosen ]),
+                        Row([ dosen.inputan_nidn_dosen ]),
+                        Row([ dosen.inputan_nama_dosen ]),
+                        Row([ dosen.inputan_jk_dosen ]),
+                        Row([ dosen.inputan_tgl_lhr_dosen, FloatingActionButton(icon=icons.CALENDAR_MONTH, on_click=lambda _: dosen.opsi_tanggal.pick_date()) ]),
+                        Row([ dosen.inputan_alamat_dosen ]),
+                        Row([
+                            #tombol tambah data
+                            ElevatedButton(
+                                "Simpan Data",
+                                    icon = "SAVE_AS",
+                                    icon_color = "white",
+                                    color = "white",
+                                    bgcolor = "blue",
+                                    width =  250,
+                                    height = 50,
+                                    on_click = simpan_dosen,
+                                )
+                        ]),
+                    ],
+                    horizontal_alignment = CrossAxisAlignment.CENTER,
+                    height = 500,
+                    scroll= ScrollMode.ALWAYS,
+                    #tight = True,
+                    
 
-                    # AND SHOW SNACKBAR
-                    page.snack_bar = SnackBar(
-                        Text("Data success add",size = 30),
-                        bgcolor="green"
+                ),
+                padding = 40,
+                width = 378,
+                height = 500
+            ),
+            open = False,
+            #on_dismiss=bs_dismissed,
+        )
 
-                    )
-                    page.snack_bar.open = True
-                    page.update()
-                except Exception as e:
-                    print(e)
-                    print("error you CODE !!!!")
-     
+   # buat variabel tampilan layout utama
+        dosen.layout_utama = Column(
+            [
+                Container(
+                    Text(
+                        "Rekap Data Dosen",
+                        size = 25,
+                        color = "blue",
+                        weight = FontWeight.BOLD,
+                    ),
+                    alignment = alignment.center,
+                    padding = 30,
+                ),
+                Container(
+                    ElevatedButton(
+                        "Tambah Data",
+                        icon = "ADD",
+                        icon_color = "white",
+                        color = "white",
+                        bgcolor = "blue",
+                        width = 200,
+                        on_click = tampil_dialog_dosen,
+                    ),
+                    alignment = alignment.center,
+                    padding = 10,
+                ),
+                Row(
+                    [dosen.data_dosen], scroll=ScrollMode.ALWAYS
+                ),
+                dosen.layout_data,
+                dosen.snack_bar_berhasil,
+                dosen.dialog,
+                dosen.opsi_tanggal
+            ]
+        )
 
-#function/fungsi utama 
+        return dosen.layout_utama
+
+# fungsi utama
 def main (page : Page):
-    #mengatur halaman
-    page.title = "Aplikasi Note"
-    page.window_width = 375
+    # mengatur halaman
+    page.title = "Kelas A - Aplikasi CRUD (Menu & SQL)"
+    page.window_width = 350
     page.window_height = 700
     page.window_resizable = False
     page.window_maximizable = False
     page.window_minimizable = True
     page.scroll = "adaptive"
+    #page.theme_mode = "light"
     page.theme_mode = ThemeMode.DARK
 
-    #menampilkan objek 
-    judul_aplikasi_1 = 'Fattah'
-    judul_aplikasi_2 = 'Barbershop'
-    judul_aplikasi_3 = '  '
-    deskripsi_aplikasi = 'Aplikasi Input Membership Fattah Barbershop'
+    # fungsi untuk mode halaman dark/light
+    def mode_tema(e):
+        page.theme_mode = "dark" if page.theme_mode =="light" else "light"
+        page.update()
+
+    # fungsi untuk routing / pembagian halaman
+    def route_change(route):
+        page.views.clear()
+        page.views.append(
+            View("/",
+                [
+                    AppBar(
+                        title = Text("Aplikasi CRUD Jadwal Kuliah", size = 18, weight = FontWeight.BOLD, color = colors.WHITE), 
+                        bgcolor = colors.BLUE_800, 
+                        center_title = True,
+                    ),
+                    Column(
+                        [
+                            Image(src="img/Lambang.png",width=230 ),
+                            # Icon(name = icons.CAST_FOR_EDUCATION, color = colors.BLUE, size = 180),
+                            Column(
+                                controls = [
+                                    ElevatedButton("Menu Mata Kuliah", icon = icons.TABLE_ROWS, on_click = lambda _: page.go("/matakuliah"), width=205 ),
+                                    ElevatedButton("Menu Dosen", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/dosen"), width=205 ),
+                                    ElevatedButton("Menu Mahasiswa", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/mahasiswa"), width=205 ),
+                                    ElevatedButton("Menu Jadwal Kuliah", icon = icons.SCHEDULE_ROUNDED, on_click = lambda _: page.go("/jadwalkuliah"), disabled=True, width=205 ),
+                                ],
+                                width = 375,
+                                horizontal_alignment = CrossAxisAlignment.CENTER,
+                            ),
+
+                        ],
+                        height = 500,
+                        width = 375,
+                        alignment = MainAxisAlignment.SPACE_AROUND,
+                        horizontal_alignment = CrossAxisAlignment.CENTER,
+                    ),
+                    Column(
+                        [
+                            Column(
+                                controls = [
+                                    ElevatedButton("Mode Warna", icon = icons.WB_SUNNY_OUTLINED, on_click = mode_tema),
+                                ],
+                                width = 375,
+                                horizontal_alignment = CrossAxisAlignment.CENTER,
+                            ),
+                            Text('Mobile Programming @2024', size = 12)
+                        ],
+                        horizontal_alignment = CrossAxisAlignment.CENTER,
+                    ),
+                    
+                ],
+            )
+        )
+        if page.route == "/mahasiswa":
+            page.views.append(
+                View("/mahasiswa",
+                    [
+                        AppBar(title = Text("Menu Mahasiswa", size = 14, weight = FontWeight.BOLD), bgcolor = colors.SURFACE_VARIANT),
+                        FormMahasiswa()
+                    ],
+                )
+            )
+        if page.route == "/matakuliah":
+            page.views.append(
+                View("/matakuliah",
+                    [
+                        AppBar(title = Text("Menu Kuliah", size = 14, weight = FontWeight.BOLD), bgcolor = colors.SURFACE_VARIANT),
+                        FormMatakuliah()
+                    ],
+                )
+            )
+        if page.route == "/dosen":
+            page.views.append(
+                View("/dosen",
+                    [
+                        AppBar(title = Text("Menu Dosen", size = 14, weight = FontWeight.BOLD), bgcolor = colors.SURFACE_VARIANT),
+                        FormDosen()
+                    ],
+                )
+            )
+        
+        page.update()
+
+    # fungsi untuk pop up halaman
+    def view_pop(view):
+        page.views.pop()
+        top_view = page.views[-1]
+        page.go(top_view.route)
+
+    page.on_route_change = route_change
+    page.on_view_pop = view_pop
+    page.go(page.route)
 
 
-    page.add(
-        Row (
-            controls = [
-                Text(judul_aplikasi_3,
-                    size =15,
-                    weight = "bold",
-                    font_family="poppins",
-                    color = "Blue"
-                ),
-            ],
-            #aligment = MainAxisAlignment.END
-            alignment = "center"
-        ),
-        Row (
-            controls = [
-                Text(judul_aplikasi_1,
-                    size =30,
-                    weight = "bold",
-                    font_family="poppins",
-                    color = "Blue"
-                ),
-                Text(judul_aplikasi_2,
-                    size =30,
-                    weight = "bold",
-                    font_family="poppins",
-                    color = "white"
-                ), 
-            ],
-            #aligment = MainAxisAlignment.END
-            alignment = "center"
-        ),
-        Row (
-            controls = [
-
-                Text(deskripsi_aplikasi,
-                    size =12,
-                    italic= True,
-                    font_family="poppins",
-                    color = "white"
-                ),
-                
-            ],
-            #aligment = MainAxisAlignment.END
-            alignment = "center"
-        ),
-        Row (
-            controls = [
-                Text(judul_aplikasi_3,
-                    size =15,
-                    weight = "bold",
-                    font_family="poppins",
-                    color = "Blue"
-                ),
-            ],
-            #aligment = MainAxisAlignment.END
-            alignment = "center"
-        ),
-        FormCrud()
-    )
-
-#mengatur output aplikasi
+# mengatur output aplikasi
 flet.app(target = main)
-#ft.app(target = main, view = ft.AppView.WEB_BROWSER)

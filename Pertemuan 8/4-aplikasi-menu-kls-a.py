@@ -414,6 +414,232 @@ class FormMatakuliah(UserControl):
             
         # )
 
+class FormJadwal(UserControl):
+    # class untuk halaman mata kuliah
+    def build(jadwal) :
+
+        # buat variabel inputan
+        jadwal.inputan_id_jadwal = TextField(visible = False, expand = True)
+        jadwal.inputan_hari_kuliah = Dropdown(label = "Hari Kuliah", hint_text = "masukkan Hari", expand = True, options=[dropdown.Option("Senin"), dropdown.Option("Selasa"), dropdown.Option("Rabu"), dropdown.Option("Kamis"), dropdown.Option("Jumat"), dropdown.Option("Sabtu"), dropdown.Option("Minggu")],)
+        jadwal.inputan_jam_kuliah = TextField(label = "Jam Kuliah", hint_text = "masukkan Jam ", expand = True)
+        jadwal.inputan_ruang_kuliah = TextField(label = "Ruang", hint_text = "masukkan Ruang ", expand = True)
+        # id Dosen
+        txtdosen = cursor.execute("SELECT id_dosen, nidn_dosen from dosen")
+        jadwal.inputan_id_dosen = Dropdown(hint_text = "ID Dosen", expand = True, options=[dropdown.Option(row[0],row[1]) for row in cursor.fetchall()])
+        
+        cursor.execute("SELECT id_matakuliah, mata_kuliah from mata_kuliah")
+        jadwal.inputan_id_matakuliah = Dropdown(hint_text = "ID Makul", expand = True, options=[dropdown.Option(row[0],row[1]) for row in cursor.fetchall()])
+        jadwal.snack_bar_berhasil = SnackBar( Text("Operasi berhasil"), bgcolor="green")
+
+        # memuat tabel data
+        def tampil_data_jadwal(e):
+            # Merefresh halaman & menampilkan notif
+            jadwal.data_jadwal.rows.clear()
+            cursor.execute("SELECT * FROM jadwal_kuliah")
+            result = cursor.fetchall()
+            # menampilkan ulang data 
+            columns = [column[0] for column in cursor.description]
+            rows = [dict(zip(columns,row)) for row in result]
+            for row in rows:
+                jadwal.data_jadwal.rows.append(
+                    DataRow(
+                        cells = [
+                            DataCell(Text(row['id_jadwalkuliah'])),
+                            DataCell(Text(row['hari_kuliah'])),
+                            DataCell(Text(row['jam_kuliah'])),
+                            DataCell(Text(row['ruang_kuliah'])),
+                            DataCell(Text(row['id_dosen'])),
+                            DataCell(Text(row['id_matakuliah'])),
+                            DataCell(
+                                Row([
+                                    IconButton("delete", icon_color = "red", data = row, ),
+                                    IconButton("create", icon_color = "grey", data = row, ),
+                                ])
+                            ),
+                        ]
+                        )
+                    )
+
+        # fungsi menampilkan dialog form entri
+        def tampil_dialog_jadwal(e):
+            jadwal.inputan_id_jadwal.value = ''
+            jadwal.inputan_hari_kuliah.value = ''
+            jadwal.inputan_jam_kuliah.value = ''
+            jadwal.inputan_ruang_kuliah.value = ''
+            jadwal.inputan_id_dosen.value = ''
+            jadwal.inputan_id_matakuliah.value = ''
+            jadwal.dialog.open = True
+            jadwal.update()
+
+        def tampil_dialog_ubah_jadwal(e):
+            jadwal.inputan_id_jadwal.value = e.control.data['id_jadwalkuliah']
+            jadwal.inputan_hari_kuliah.value = e.control.data['hari_kuliah']
+            jadwal.inputan_jam_kuliah.value = e.control.data['jam_kuliah']
+            jadwal.inputan_ruang_kuliah.value = e.control.data['ruang_kuliah']
+            jadwal.inputan_id_dosen.value = e.control.data['id_dosen']
+            jadwal.inputan_id_matakuliah.value = e.control.data['id_matakuliah']
+            jadwal.dialog.open = True
+            jadwal.update()
+
+        # fungsi simpan data
+        def simpan_jadwal(e):
+            try:
+                if (jadwal.inputan_id_jadwal.value == '') :
+                    sql = "INSERT INTO jadwal_kuliah (id_jadwalkuliah, hari_kuliah, jam_kuliah, ruang_kuliah, id_dosen, id_matakuliah) VALUES(%s, %s, %s, %s, %s, %s)"
+                    val = (jadwal.inputan_id_jadwal.value, jadwal.inputan_hari_kuliah.value, jadwal.inputan_jam_kuliah.value, jadwal.inputan_ruang_kuliah.value, jadwal.inputan_id_dosen.value, jadwal.inputan_id_matakuliah.value)
+                else :
+                    sql = "UPDATE jadwal_kuliah SET hari_kuliah = %s, jam_kuliah = %s, ruang_kuliah = %s, id_dosen = %s, id_matakuliah = %s WHERE id_jadwalkuliah = %s"
+                    val = (jadwal.inputan_hari_kuliah.value, jadwal.inputan_jam_kuliah.value, jadwal.inputan_ruang_kuliah.value, jadwal.inputan_id_dosen.value, jadwal.inputan_id_matakuliah.value,  jadwal.inputan_id_jadwal.value)
+                    
+                cursor.execute(sql, val)
+                koneksi_db.commit()
+                print(cursor.rowcount, "Data di simpan!")
+
+                tampil_data_jadwal(e)
+                jadwal.dialog.open = False
+                jadwal.snack_bar_berhasil.open = True
+                jadwal.update()
+            except Exception as e:
+                print(e)
+                print("Ada yang error!")
+
+
+        # fungsi hapus data
+        def hapus_jadwal(e):
+            try:
+                sql = "DELETE FROM jadwal_kuliah WHERE id_jadwalkuliah = %s"
+                val = (e.control.data['id_jadwalkuliah'],)
+                cursor.execute(sql, val)
+                koneksi_db.commit()
+                print(cursor.rowcount, "data di hapus!")
+                jadwal.data_jadwal.rows.clear()
+                
+                tampil_data_jadwal(e)
+                jadwal.dialog.open = False
+                jadwal.snack_bar_berhasil.open = True
+                jadwal.update()
+            except Exception as e:
+                print(e)
+                print("Ada yang error!")
+
+        # menampilkan semua data ke dalam tabel
+        cursor.execute("SELECT * FROM jadwal_kuliah")
+        result = cursor.fetchall()
+        columns = [column[0] for column in cursor.description]
+        rows = [dict(zip(columns,row)) for row in result]
+        jadwal.data_jadwal = DataTable(
+            columns = [
+                DataColumn(Text("ID Jadwal")),
+                DataColumn(Text("Hari Kuliah")),
+                DataColumn(Text("Jam Kuliah")),
+                DataColumn(Text("Ruang Kuliah")),
+                DataColumn(Text("ID Dosen")),
+                DataColumn(Text("ID Matakuliah")),
+                DataColumn(Text("Opsi")),
+            ],
+        )
+        for row in rows:
+            jadwal.data_jadwal.rows.append(
+                DataRow(
+                    cells = [
+                            DataCell(Text(row['id_jadwalkuliah'])),
+                            DataCell(Text(row['hari_kuliah'])),
+                            DataCell(Text(row['jam_kuliah'])),
+                            DataCell(Text(row['ruang_kuliah'])),
+                            DataCell(Text(row['id_dosen'])),
+                            DataCell(Text(row['id_matakuliah'])),
+                        DataCell(
+                            Row([
+                                IconButton("delete", icon_color = "red", data = row, on_click = hapus_jadwal ),
+                                IconButton("create", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_jadwal),
+                            ])
+                        ),
+                    ]
+                )
+            )
+
+        # buat variabel utk layout data rekapan
+        jadwal.layout_data = Column()
+
+        # buat form dialog untuk form entri data
+        jadwal.dialog = BottomSheet(
+            Container(
+                Column(
+                    [
+                        Text("Form Entri Data Jadwal", weight = FontWeight.BOLD),
+                        Row([ jadwal.inputan_id_jadwal ]),
+                        Row([ jadwal.inputan_hari_kuliah ]),
+                        Row([ jadwal.inputan_jam_kuliah  ]),
+                        Row([ jadwal.inputan_ruang_kuliah ]),
+                        Row([ jadwal.inputan_id_dosen]),
+                        Row([ jadwal.inputan_id_matakuliah ]),
+                        Row([
+                            #tombol tambah data
+                            ElevatedButton(
+                                "Simpan Data",
+                                    icon = "SAVE_AS",
+                                    icon_color = "white",
+                                    color = "white",
+                                    bgcolor = "blue",
+                                    width =  250,
+                                    height = 50,
+                                    on_click = simpan_jadwal,
+                                )
+                        ]),
+                    ],
+                    horizontal_alignment = CrossAxisAlignment.CENTER,
+                    height = 500,
+                    scroll= ScrollMode.ALWAYS,
+                    #tight = True,
+                    
+
+                ),
+                padding = 40,
+                width = 378,
+                height = 500
+            ),
+            open = False,
+            #on_dismiss=bs_dismissed,
+        )
+
+   # buat variabel tampilan layout utama
+        jadwal.layout_utama = Column(
+            [
+                Container(
+                    Text(
+                        "Jadwal MataKuliah",
+                        size = 25,
+                        color = "blue",
+                        weight = FontWeight.BOLD,
+                    ),
+                    alignment = alignment.center,
+                    padding = 30,
+                ),
+                Container(
+                    ElevatedButton(
+                        "Tambah Data",
+                        icon = "ADD",
+                        icon_color = "white",
+                        color = "white",
+                        bgcolor = "blue",
+                        width = 200,
+                        on_click = tampil_dialog_jadwal,
+                    ),
+                    alignment = alignment.center,
+                    padding = 10,
+                ),
+                Row(
+                    [jadwal.data_jadwal], scroll=ScrollMode.ALWAYS
+                ),
+                jadwal.layout_data,
+                jadwal.snack_bar_berhasil,
+                jadwal.dialog,
+            ]
+        )
+
+        return jadwal.layout_utama
+
+
 class FormDosen(UserControl):
     # class untuk halaman mata kuliah
     def build(dosen) :
@@ -651,7 +877,6 @@ class FormDosen(UserControl):
         )
 
         return dosen.layout_utama
-
 # fungsi utama
 def main (page : Page):
     # mengatur halaman
@@ -690,7 +915,7 @@ def main (page : Page):
                                     ElevatedButton("Menu Mata Kuliah", icon = icons.TABLE_ROWS, on_click = lambda _: page.go("/matakuliah"), width=205 ),
                                     ElevatedButton("Menu Dosen", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/dosen"), width=205 ),
                                     ElevatedButton("Menu Mahasiswa", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/mahasiswa"), width=205 ),
-                                    ElevatedButton("Menu Jadwal Kuliah", icon = icons.SCHEDULE_ROUNDED, on_click = lambda _: page.go("/jadwalkuliah"), disabled=True, width=205 ),
+                                    ElevatedButton("Menu Jadwal Kuliah", icon = icons.SCHEDULE_ROUNDED, on_click = lambda _: page.go("/jadwal"), width=205 ),
                                 ],
                                 width = 375,
                                 horizontal_alignment = CrossAxisAlignment.CENTER,
@@ -743,6 +968,15 @@ def main (page : Page):
                     [
                         AppBar(title = Text("Menu Dosen", size = 14, weight = FontWeight.BOLD), bgcolor = colors.SURFACE_VARIANT),
                         FormDosen()
+                    ],
+                )
+            )
+        if page.route == "/jadwal":
+            page.views.append(
+                View("/jadwal",
+                    [
+                        AppBar(title = Text("Menu Jadwal", size = 14, weight = FontWeight.BOLD), bgcolor = colors.SURFACE_VARIANT),
+                        FormJadwal()
                     ],
                 )
             )
