@@ -496,6 +496,7 @@ class Reservasi(UserControl):
                     alignment = alignment.center,
                     padding = 10,
                 ),
+                
                 Row(
                     [reservasi.data_reservasi], scroll=ScrollMode.ALWAYS
                 ),
