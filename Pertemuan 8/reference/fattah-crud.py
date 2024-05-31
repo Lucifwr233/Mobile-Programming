@@ -299,10 +299,14 @@ class Reservasi(UserControl):
 
         # buat variabel inputan
         reservasi.inputan_id_reservasi= TextField(visible = False, expand = True)
-        reservasi.inputan_id_pelanggan = TextField(label = "Nama Pelanggan", hint_text = "Nama Pelanggan", expand = True)
+
+        cursor.execute("SELECT * FROM membership")
+        reservasi.inputan_id_pelanggan = Dropdown(label = "Nama Pelanggan", hint_text = "Nama Pelanggan", expand = True, options=[dropdown.Option(row[0],row[1] + " - " + row[2]) for row in cursor.fetchall()])
         reservasi.inputan_tanggal_reservasi = TextField(label = "Tanggal Reservasi", hint_text = "Tanggal Reservasi", expand = True)
         reservasi.inputan_waktu_reservasi = TextField(label = "Waktu Reservasi", hint_text = "Waktu Reservasi", expand = True)
-        reservasi.inputan_jenis_layanan= Dropdown(label = "Jenis Layanan", hint_text = "Jenis", expand = True, options=[dropdown.Option("Potong Rambut"), dropdown.Option("Perawatan Rambut")],)
+
+        cursor.execute("SELECT * FROM layanan")
+        reservasi.inputan_jenis_layanan= Dropdown(label = "Jenis Layanan", hint_text = "Jenis", expand = True, options=[dropdown.Option(row[0],row[1] + " - " + row[2]) for row in cursor.fetchall()],)
         reservasi.snack_bar_berhasil = SnackBar( Text("Operasi berhasil"), bgcolor="green")
 
         # memuat tabel data
@@ -318,6 +322,10 @@ class Reservasi(UserControl):
                 reservasi.data_reservasi.rows.append(
                     DataRow(
                         cells = [
+                            DataCell(
+                            Row([
+                                IconButton("INFO_OUTLINED", icon_color = "grey", data = row, ),
+                            ])),
                             DataCell(Text(row['id_reservasi'])),
                             DataCell(Text(row['id_pelanggan'])),
                             DataCell(Text(row['tanggal_reservasi'])),
@@ -341,6 +349,7 @@ class Reservasi(UserControl):
             reservasi.inputan_waktu_reservasi.value = ''
             reservasi.inputan_jenis_layanan.value = ''
             reservasi.dialog.open = True
+            reservasi.dialog_detail.open = False
             reservasi.update()
 
         def tampil_dialog_ubah_reservasi(e):
@@ -350,6 +359,25 @@ class Reservasi(UserControl):
             reservasi.inputan_waktu_reservasi.value = e.control.data['waktu_reservasi']
             reservasi.inputan_jenis_layanan.value = e.control.data['jns_layanan']
             reservasi.dialog.open = True
+            reservasi.dialog_detail.open = False
+            reservasi.update()
+
+        def tampil_dialog_detail_reservasi(e):
+            reservasi.inputan_id_reservasi.value = e.control.data['id_reservasi']
+            reservasi.inputan_id_pelanggan.value = e.control.data['id_pelanggan']
+            reservasi.inputan_tanggal_reservasi.value = e.control.data['tanggal_reservasi']
+            reservasi.inputan_waktu_reservasi.value = e.control.data['waktu_reservasi']
+            reservasi.inputan_jenis_layanan.value = e.control.data['jns_layanan']
+
+            # Mengatur inputan menjadi readonly
+            reservasi.inputan_id_reservasi.readonly = True
+            reservasi.inputan_id_pelanggan.readonly = True
+            reservasi.inputan_tanggal_reservasi.readonly = True
+            reservasi.inputan_waktu_reservasi.readonly = True
+            reservasi.inputan_jenis_layanan.readonly = True
+
+            reservasi.dialog_detail.open = True
+            reservasi.dialog.open = False
             reservasi.update()
 
         # fungsi simpan data
@@ -368,6 +396,7 @@ class Reservasi(UserControl):
 
                 tampil_reservasi(e)
                 reservasi.dialog.open = False
+                reservasi.dialog_detail.open = False
                 reservasi.snack_bar_berhasil.open = True
                 reservasi.update()
             except Exception as e:
@@ -387,6 +416,7 @@ class Reservasi(UserControl):
                 
                 tampil_reservasi(e)
                 reservasi.dialog.open = False
+                reservasi.dialog_detail.open = False
                 reservasi.snack_bar_berhasil.open = True
                 reservasi.update()
             except Exception as e:
@@ -400,6 +430,7 @@ class Reservasi(UserControl):
         rows = [dict(zip(columns,row)) for row in result]
         reservasi.data_reservasi = DataTable(
             columns = [
+                DataColumn(Text("Detail")),
                 DataColumn(Text("ID Reservasi")),
                 DataColumn(Text("ID Pelanggan")),
                 DataColumn(Text("Tanggal Reservasi")),
@@ -412,6 +443,11 @@ class Reservasi(UserControl):
             reservasi.data_reservasi.rows.append(
                 DataRow(
                     cells = [
+                        DataCell(
+                            Row([
+                                IconButton("INFO_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_detail_reservasi),
+                            ])
+                            ),
                             DataCell(Text(row['id_reservasi'])),
                             DataCell(Text(row['id_pelanggan'])),
                             DataCell(Text(row['tanggal_reservasi'])),
@@ -429,6 +465,7 @@ class Reservasi(UserControl):
 
         # buat variabel utk layout data rekapan
         reservasi.layout_data = Column()
+
 
         # buat form dialog untuk form entri data
         reservasi.dialog = BottomSheet(
@@ -470,6 +507,35 @@ class Reservasi(UserControl):
             #on_dismiss=bs_dismissed,
         )
 
+        # buat form dialog untuk form entri data
+        reservasi.dialog_detail = BottomSheet(
+            Container(
+                Column(
+                    [
+                        Text("Detail Data Reservasi", weight = FontWeight.BOLD),
+                        Row([reservasi.inputan_id_reservasi]),
+                        Row([reservasi.inputan_id_pelanggan]),
+                        Row([reservasi.inputan_tanggal_reservasi]),
+                        Row([reservasi.inputan_waktu_reservasi]),
+                        Row([reservasi.inputan_jenis_layanan]),
+                    ],
+                    horizontal_alignment = CrossAxisAlignment.CENTER,
+                    height = 500,
+                    scroll= ScrollMode.ALWAYS,
+                    #tight = True,
+                    
+
+                ),
+                padding = 40,
+                width = 378,
+                height = 500
+            ),
+            open = False,
+            #on_dismiss=bs_dismissed,
+        )
+
+
+
    # buat variabel tampilan layout utama
         reservasi.layout_utama = Column(
             [
@@ -496,14 +562,15 @@ class Reservasi(UserControl):
                     alignment = alignment.center,
                     padding = 10,
                 ),
-                
+
                 Row(
                     [reservasi.data_reservasi], scroll=ScrollMode.ALWAYS
                 ),
                 reservasi.layout_data,
+                reservasi.opsi_tanggal,
                 reservasi.snack_bar_berhasil,
                 reservasi.dialog,
-                reservasi.opsi_tanggal,
+                reservasi.dialog_detail
             ]
         )
 
