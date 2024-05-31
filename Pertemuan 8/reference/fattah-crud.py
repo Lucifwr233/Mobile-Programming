@@ -476,7 +476,7 @@ class Reservasi(UserControl):
                 Container(
                     Text(
                         "Rekap Data Reservasi",
-                        size = 25,
+                        size = 23,
                         color = "blue",
                         weight = FontWeight.BOLD,
                     ),
@@ -507,6 +507,207 @@ class Reservasi(UserControl):
         )
 
         return reservasi.layout_utama
+
+
+class Layanan(UserControl):
+    # class untuk halaman mata kuliah
+    def build(layanan) :
+
+        # buat variabel inputan
+        layanan.inputan_id_layanan= TextField(visible = False, expand = True)
+        layanan.inputan_jenis_layanan= Dropdown(label = "Jenis Layanan", hint_text = "Jenis", expand = True, options=[dropdown.Option("Potong Rambut"), dropdown.Option("Perawatan Rambut")],)
+        layanan.inputan_harga_layanan = TextField(label = "Harga Layanan", hint_text = "Harga Layanan", expand = True)
+        layanan.snack_bar_berhasil = SnackBar( Text("Operasi berhasil"), bgcolor="green")
+
+        # memuat tabel data
+        def tampil_layanan(e):
+            # Merefresh halaman & menampilkan notif
+            layanan.data_layanan.rows.clear()
+            cursor.execute("SELECT * FROM layanan")
+            result = cursor.fetchall()
+            # menampilkan ulang data 
+            columns = [column[0] for column in cursor.description]
+            rows = [dict(zip(columns,row)) for row in result]
+            for row in rows:
+                layanan.data_layanan.rows.append(
+                    DataRow(
+                        cells = [
+                            DataCell(Text(row['id_layanan'])),
+                            DataCell(Text(row['jns_layanan'])),
+                            DataCell(Text(row['hrg_layanan'])),
+                            DataCell(
+                                Row([
+                                    IconButton("delete", icon_color = "red", data = row, ),
+                                    IconButton("create", icon_color = "grey", data = row, ),
+                                ])
+                            ),
+                        ]
+                        )
+                    )
+
+        # fungsi menampilkan dialog form entri
+        def tampil_dialog_layanan(e):
+            layanan.inputan_id_layanan.value = ''
+            layanan.inputan_jenis_layanan.value = ''
+            layanan.inputan_harga_layanan.value = ''
+            layanan.dialog.open = True
+            layanan.update()
+
+        def tampil_dialog_ubah_layanan(e):
+            layanan.inputan_id_layanan.value = e.control.data['id_layanan']
+            layanan.inputan_jenis_layanan.value = e.control.data['jns_layanan']
+            layanan.inputan_harga_layanan.value = e.control.data['hrg_layanan']
+            layanan.dialog.open = True
+            layanan.update()
+
+        # fungsi simpan data
+        def simpan_layanan(e):
+            try:
+                if (layanan.inputan_id_layanan.value == '') :
+                    sql = "INSERT INTO layanan (id_layanan, jns_layanan, hrg_layanan ) VALUES(%s, %s, %s)"
+                    val = (layanan.inputan_id_layanan.value, layanan.inputan_jenis_layanan.value, layanan.inputan_harga_layanan.value)
+                else :
+                    sql = "UPDATE layanan SET jns_layanan = %s, hrg_layanan = %s WHERE id_layanan = %s"
+                    val = (layanan.inputan_jenis_layanan.value, layanan.inputan_harga_layanan.value, layanan.inputan_id_layanan.value)
+                    
+                cursor.execute(sql, val)
+                koneksi_db.commit()
+                print(cursor.rowcount, "Data di simpan!")
+
+                tampil_layanan(e)
+                layanan.dialog.open = False
+                layanan.snack_bar_berhasil.open = True
+                layanan.update()
+            except Exception as e:
+                print(e)
+                print("Ada yang error!")
+
+
+        # fungsi hapus data
+        def hapus_layanan(e):
+            try:
+                sql = "DELETE FROM layanan WHERE id_layanan = %s"
+                val = (e.control.data['id_layanan'],)
+                cursor.execute(sql, val)
+                koneksi_db.commit()
+                print(cursor.rowcount, "data di hapus!")
+                layanan.data_layanan.rows.clear()
+                
+                tampil_layanan(e)
+                layanan.dialog.open = False
+                layanan.snack_bar_berhasil.open = True
+                layanan.update()
+            except Exception as e:
+                print(e)
+                print("Ada yang error!")
+
+        # menampilkan semua data ke dalam tabel
+        cursor.execute("SELECT * FROM layanan")
+        result = cursor.fetchall()
+        columns = [column[0] for column in cursor.description]
+        rows = [dict(zip(columns,row)) for row in result]
+        layanan.data_layanan = DataTable(
+            columns = [
+                DataColumn(Text("ID Layanan")),
+                DataColumn(Text("Jenis Layanan")),
+                DataColumn(Text("Harga Layanan")),
+                DataColumn(Text("Opsi")),
+            ],
+        )
+        for row in rows:
+            layanan.data_layanan.rows.append(
+                DataRow(
+                    cells = [
+                            DataCell(Text(row['id_layanan'])),
+                            DataCell(Text(row['jns_layanan'])),
+                            DataCell(Text(row['hrg_layanan'])),
+                        DataCell(
+                            Row([
+                                IconButton("delete", icon_color = "red", data = row, on_click = hapus_layanan ),
+                                IconButton("create", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_layanan),
+                            ])
+                        ),
+                    ]
+                )
+            )
+
+        # buat variabel utk layout data rekapan
+        layanan.layout_data = Column()
+
+        # buat form dialog untuk form entri data
+        layanan.dialog = BottomSheet(
+            Container(
+                Column(
+                    [
+                        Text("Form Entri Data Layanan", weight = FontWeight.BOLD),
+                        Row([ layanan.inputan_id_layanan ]),
+                        Row([ layanan.inputan_jenis_layanan ]),
+                        Row([ layanan.inputan_harga_layanan ]),
+                        Row([
+                            #tombol tambah data
+                            ElevatedButton(
+                                "Simpan Data",
+                                    icon = "SAVE_AS",
+                                    icon_color = "white",
+                                    color = "white",
+                                    bgcolor = "blue",
+                                    width =  250,
+                                    height = 50,
+                                    on_click = simpan_layanan,
+                                )
+                        ]),
+                    ],
+                    horizontal_alignment = CrossAxisAlignment.CENTER,
+                    height = 500,
+                    scroll= ScrollMode.ALWAYS,
+                    #tight = True,
+                    
+
+                ),
+                padding = 40,
+                width = 378,
+                height = 500
+            ),
+            open = False,
+            #on_dismiss=bs_dismissed,
+        )
+
+   # buat variabel tampilan layout utama
+        layanan.layout_utama = Column(
+            [
+                Container(
+                    Text(
+                        "Rekap Data Layanan",
+                        size = 25,
+                        color = "blue",
+                        weight = FontWeight.BOLD,
+                    ),
+                    alignment = alignment.center,
+                    padding = 30,
+                ),
+                Container(
+                    ElevatedButton(
+                        "Tambah Data",
+                        icon = "ADD",
+                        icon_color = "white",
+                        color = "white",
+                        bgcolor = "blue",
+                        width = 200,
+                        on_click = tampil_dialog_layanan,
+                    ),
+                    alignment = alignment.center,
+                    padding = 10,
+                ),
+                Row(
+                    [layanan.data_layanan], scroll=ScrollMode.ALWAYS
+                ),
+                layanan.layout_data,
+                layanan.snack_bar_berhasil,
+                layanan.dialog,
+            ]
+        )
+
+        return layanan.layout_utama
 
 # fungsi utama
 def main (page : Page):
@@ -545,7 +746,7 @@ def main (page : Page):
                                 controls = [
                                     ElevatedButton("Menu Reservasi", icon = icons.TABLE_ROWS, on_click = lambda _: page.go("/reservasi"), width=205),
                                     ElevatedButton("Menu Membership", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/member"), width=205 ),
-                                    ElevatedButton("Menu Mahasiswa", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/mahasiswa"), width=205, disabled= True ),
+                                    ElevatedButton("Menu Layanan", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/layanan"), width=205 ),
                                     ElevatedButton("Menu Jadwal Kuliah", icon = icons.SCHEDULE_ROUNDED, on_click = lambda _: page.go("/jadwalkuliah"), disabled=True, width=205 ),
                                 ],
                                 width = 375,
@@ -593,12 +794,12 @@ def main (page : Page):
                     ],
                 )
             )
-        if page.route == "/dosen":
+        if page.route == "/layanan":
             page.views.append(
-                View("/dosen",
+                View("/layanan",
                     [
-                        AppBar(title = Text("Menu Dosen", size = 14, weight = FontWeight.BOLD), bgcolor = colors.SURFACE_VARIANT),
-                        FormDosen()
+                        AppBar(title = Text("Menu Layanan", size = 14, weight = FontWeight.BOLD), bgcolor = colors.SURFACE_VARIANT),
+                        Layanan()
                     ],
                 )
             )
