@@ -274,6 +274,246 @@ class FormMember(UserControl):
 
         return member.layout_utama
 
+
+class Reservasi(UserControl):
+    # class untuk halaman mata kuliah
+    def build(reservasi) :
+
+        # tgl lhr reservasi
+        def ubah_tanggal_lhr(e):
+            tgl_baru = reservasi.opsi_tanggal.value
+            reservasi.inputan_tanggal_reservasi.value = tgl_baru.date()
+            reservasi.update()
+            
+        def opsi_tanggal_lhr_dismissed(e):
+            tgl_baru = reservasi.inputan_tanggal_reservasi.value
+            reservasi.inputan_tanggal_reservasi.value = tgl_baru
+            reservasi.update()
+        
+        reservasi.opsi_tanggal = DatePicker(
+            on_change=ubah_tanggal_lhr,
+            on_dismiss=opsi_tanggal_lhr_dismissed,
+            first_date=datetime.datetime(2023, 10, 1),
+            last_date=datetime.datetime(2024, 10, 1),
+        )
+
+        # buat variabel inputan
+        reservasi.inputan_id_reservasi= TextField(visible = False, expand = True)
+        reservasi.inputan_id_pelanggan = TextField(label = "Nama Pelanggan", hint_text = "Nama Pelanggan", expand = True)
+        reservasi.inputan_tanggal_reservasi = TextField(label = "Tanggal Reservasi", hint_text = "Tanggal Reservasi", expand = True)
+        reservasi.inputan_waktu_reservasi = TextField(label = "Waktu Reservasi", hint_text = "Waktu Reservasi", expand = True)
+        reservasi.inputan_jenis_layanan= Dropdown(label = "Jenis Layanan", hint_text = "Jenis", expand = True, options=[dropdown.Option("Potong Rambut"), dropdown.Option("Perawatan Rambut")],)
+        reservasi.snack_bar_berhasil = SnackBar( Text("Operasi berhasil"), bgcolor="green")
+
+        # memuat tabel data
+        def tampil_reservasi(e):
+            # Merefresh halaman & menampilkan notif
+            reservasi.data_reservasi.rows.clear()
+            cursor.execute("SELECT * FROM reservasi")
+            result = cursor.fetchall()
+            # menampilkan ulang data 
+            columns = [column[0] for column in cursor.description]
+            rows = [dict(zip(columns,row)) for row in result]
+            for row in rows:
+                reservasi.data_reservasi.rows.append(
+                    DataRow(
+                        cells = [
+                            DataCell(Text(row['id_reservasi'])),
+                            DataCell(Text(row['id_pelanggan'])),
+                            DataCell(Text(row['tanggal_reservasi'])),
+                            DataCell(Text(row['waktu_reservasi'])),
+                            DataCell(Text(row['jns_layanan'])),
+                            DataCell(
+                                Row([
+                                    IconButton("delete", icon_color = "red", data = row, ),
+                                    IconButton("create", icon_color = "grey", data = row, ),
+                                ])
+                            ),
+                        ]
+                        )
+                    )
+
+        # fungsi menampilkan dialog form entri
+        def tampil_dialog_reservasi(e):
+            reservasi.inputan_id_reservasi.value = ''
+            reservasi.inputan_id_pelanggan.value = ''
+            reservasi.inputan_tanggal_reservasi.value = ''
+            reservasi.inputan_waktu_reservasi.value = ''
+            reservasi.inputan_jenis_layanan.value = ''
+            reservasi.dialog.open = True
+            reservasi.update()
+
+        def tampil_dialog_ubah_reservasi(e):
+            reservasi.inputan_id_reservasi.value = e.control.data['id_reservasi']
+            reservasi.inputan_id_pelanggan.value = e.control.data['id_pelanggan']
+            reservasi.inputan_tanggal_reservasi.value = e.control.data['tanggal_reservasi']
+            reservasi.inputan_waktu_reservasi.value = e.control.data['waktu_reservasi']
+            reservasi.inputan_jenis_layanan.value = e.control.data['jns_layanan']
+            reservasi.dialog.open = True
+            reservasi.update()
+
+        # fungsi simpan data
+        def simpan_reservasi(e):
+            try:
+                if (reservasi.inputan_id_reservasi.value == '') :
+                    sql = "INSERT INTO reservasi (id_reservasi, id_pelanggan, tanggal_reservasi, waktu_reservasi, jns_layanan) VALUES(%s, %s, %s, %s, %s)"
+                    val = (reservasi.inputan_id_reservasi.value, reservasi.inputan_id_pelanggan.value, reservasi.tanggal_reservasi.value, reservasi.inputan_waktu_reservasi.value, reservasi.inputan_jenis_layanan.value)
+                else :
+                    sql = "UPDATE reservasi SET id_pelanggan = %s, tanggal_reservasi = %s, waktu_reservasi = %s, jns_layanan = %s, WHERE id_reservasi = %s"
+                    val = (reservasi.inputan_id_pelanggan.value, reservasi.inputan_tanggal_reservasi.value, reservasi.inputan_waktu_reservasi.value, reservasi.inputan_jenis_layanan.value, reservasi.inputan_id_reservasi.value)
+                    
+                cursor.execute(sql, val)
+                koneksi_db.commit()
+                print(cursor.rowcount, "Data di simpan!")
+
+                tampil_reservasi(e)
+                reservasi.dialog.open = False
+                reservasi.snack_bar_berhasil.open = True
+                reservasi.update()
+            except Exception as e:
+                print(e)
+                print("Ada yang error!")
+
+
+        # fungsi hapus data
+        def hapus_member(e):
+            try:
+                sql = "DELETE FROM membership WHERE id = %s"
+                val = (e.control.data['id'],)
+                cursor.execute(sql, val)
+                koneksi_db.commit()
+                print(cursor.rowcount, "data di hapus!")
+                member.data_member.rows.clear()
+                
+                tampil_member(e)
+                member.dialog.open = False
+                member.snack_bar_berhasil.open = True
+                member.update()
+            except Exception as e:
+                print(e)
+                print("Ada yang error!")
+
+        # menampilkan semua data ke dalam tabel
+        cursor.execute("SELECT * FROM membership")
+        result = cursor.fetchall()
+        columns = [column[0] for column in cursor.description]
+        rows = [dict(zip(columns,row)) for row in result]
+        member.data_member = DataTable(
+            columns = [
+                DataColumn(Text("ID")),
+                DataColumn(Text("Nama")),
+                DataColumn(Text("Jenis Kelamin")),
+                DataColumn(Text("Tgl Lahir")),
+                DataColumn(Text("Alamat")),
+                DataColumn(Text("Telp")),
+                DataColumn(Text("Tgl Member")),
+                DataColumn(Text("Opsi")),
+            ],
+        )
+        for row in rows:
+            member.data_member.rows.append(
+                DataRow(
+                    cells = [
+                            DataCell(Text(row['id'])),
+                            DataCell(Text(row['nama'])),
+                            DataCell(Text(row['jekel'])),
+                            DataCell(Text(row['tgl_lahir'])),
+                            DataCell(Text(row['alamat'])),
+                            DataCell(Text(row['telp'])),
+                            DataCell(Text(row['tgl_member'])),
+                        DataCell(
+                            Row([
+                                IconButton("delete", icon_color = "red", data = row, on_click = hapus_member ),
+                                IconButton("create", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_member),
+                            ])
+                        ),
+                    ]
+                )
+            )
+
+        # buat variabel utk layout data rekapan
+        member.layout_data = Column()
+
+        # buat form dialog untuk form entri data
+        member.dialog = BottomSheet(
+            Container(
+                Column(
+                    [
+                        Text("Form Entri Data Member", weight = FontWeight.BOLD),
+                        Row([ member.inputan_id ]),
+                        Row([ member.inputan_nama ]),
+                        Row([ member.inputan_jekel ]),
+                        Row([ member.inputan_alamat ]),
+                        Row([ member.inputan_tgl_lahir, FloatingActionButton(icon=icons.CALENDAR_MONTH, on_click=lambda _: member.opsi_tanggal.pick_date())  ]),
+                        Row([ member.inputan_telp ]),
+                        Row([ member.inputan_tgl_member, FloatingActionButton(icon=icons.CALENDAR_MONTH, on_click=lambda _: member.opsi_tanggal_member.pick_date()) ]),
+                        Row([
+                            #tombol tambah data
+                            ElevatedButton(
+                                "Simpan Data",
+                                    icon = "SAVE_AS",
+                                    icon_color = "white",
+                                    color = "white",
+                                    bgcolor = "blue",
+                                    width =  250,
+                                    height = 50,
+                                    on_click = simpan_member,
+                                )
+                        ]),
+                    ],
+                    horizontal_alignment = CrossAxisAlignment.CENTER,
+                    height = 500,
+                    scroll= ScrollMode.ALWAYS,
+                    #tight = True,
+                    
+
+                ),
+                padding = 40,
+                width = 378,
+                height = 500
+            ),
+            open = False,
+            #on_dismiss=bs_dismissed,
+        )
+
+   # buat variabel tampilan layout utama
+        member.layout_utama = Column(
+            [
+                Container(
+                    Text(
+                        "Rekap Data Member",
+                        size = 25,
+                        color = "blue",
+                        weight = FontWeight.BOLD,
+                    ),
+                    alignment = alignment.center,
+                    padding = 30,
+                ),
+                Container(
+                    ElevatedButton(
+                        "Tambah Data",
+                        icon = "ADD",
+                        icon_color = "white",
+                        color = "white",
+                        bgcolor = "blue",
+                        width = 200,
+                        on_click = tampil_dialog_member,
+                    ),
+                    alignment = alignment.center,
+                    padding = 10,
+                ),
+                Row(
+                    [member.data_member], scroll=ScrollMode.ALWAYS
+                ),
+                member.layout_data,
+                member.snack_bar_berhasil,
+                member.dialog,
+                reservasi.opsi_tanggal,
+            ]
+        )
+
+        return member.layout_utama
+
 # fungsi utama
 def main (page : Page):
     # mengatur halaman
