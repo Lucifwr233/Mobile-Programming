@@ -278,6 +278,7 @@ class FormMember(UserControl):
 class Reservasi(UserControl):
     # class untuk halaman mata kuliah
     def build(reservasi) :
+
         # tgl lhr reservasi
         def ubah_tanggal_lhr(e):
             tgl_baru = reservasi.opsi_tanggal.value
@@ -296,8 +297,26 @@ class Reservasi(UserControl):
             last_date=datetime.datetime(2024, 10, 1),
         )
 
-        # buat variabel inputan
+        #input jam
+        def ubah_jam(e):
+            jam_baru = reservasi.opsi_jam.value
+            reservasi.inputan_waktu_reservasi.value = jam_baru.strftime('%H:%M')
+            reservasi.update()
 
+        def ubah_jam_dismissed(e):
+            jam_baru = reservasi.inputan_waktu_reservasi.value
+            reservasi.inputan_waktu_reservasi.value = jam_baru
+            reservasi.update()
+
+        reservasi.opsi_jam = TimePicker(
+            confirm_text="Confirm",
+            error_invalid_text="Time out of range",
+            help_text="Pick your time slot",
+            on_change=ubah_jam,
+            on_dismiss=ubah_jam_dismissed,
+        )
+
+        # buat variabel inputan
         reservasi.inputan_id_reservasi= TextField(visible = False, expand = True)
 
         cursor.execute("SELECT * FROM membership")
@@ -444,7 +463,7 @@ class Reservasi(UserControl):
                         Row([ reservasi.inputan_id_reservasi ]),
                         Row([ reservasi.inputan_id_pelanggan ]),
                         Row([ reservasi.inputan_tanggal_reservasi, FloatingActionButton(icon=icons.CALENDAR_MONTH, on_click=lambda _: reservasi.opsi_tanggal.pick_date())  ]),
-                        Row([ reservasi.inputan_waktu_reservasi ]),
+                        Row([ reservasi.inputan_waktu_reservasi,FloatingActionButton(icon=icons.TIME_TO_LEAVE, on_click=lambda _: reservasi.opsi_jam.pick_time()) ]),
                         Row([ reservasi.inputan_jenis_layanan ]),
                         Row([
                             #tombol tambah data
@@ -508,6 +527,7 @@ class Reservasi(UserControl):
                 ),
                 reservasi.layout_data,
                 reservasi.opsi_tanggal,
+                reservasi.opsi_jam,
                 reservasi.snack_bar_berhasil,
                 reservasi.dialog,
             ]
