@@ -463,7 +463,7 @@ class Reservasi(UserControl):
                         Row([ reservasi.inputan_id_reservasi ]),
                         Row([ reservasi.inputan_id_pelanggan ]),
                         Row([ reservasi.inputan_tanggal_reservasi, FloatingActionButton(icon=icons.CALENDAR_MONTH, on_click=lambda _: reservasi.opsi_tanggal.pick_date())  ]),
-                        Row([ reservasi.inputan_waktu_reservasi,FloatingActionButton(icon=icons.TIME_TO_LEAVE, on_click=lambda _: reservasi.opsi_jam.pick_time()) ]),
+                        Row([ reservasi.inputan_waktu_reservasi,FloatingActionButton(icon=icons.ACCESS_TIME, on_click=lambda _: reservasi.opsi_jam.pick_time()) ]),
                         Row([ reservasi.inputan_jenis_layanan ]),
                         Row([
                             #tombol tambah data
