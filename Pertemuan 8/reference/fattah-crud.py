@@ -80,8 +80,8 @@ class FormMember(UserControl):
                             DataCell(Text(row['tgl_member'])),
                             DataCell(
                                 Row([
-                                    IconButton("delete", icon_color = "red", data = row, ),
-                                    IconButton("create", icon_color = "grey", data = row, ),
+                                    IconButton("EDIT_OUTLINED", icon_color = "grey", data = row,on_click=tampil_dialog_ubah_member ),
+                                    IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row,on_click=hapus_member ),
                                 ])
                             ),
                         ]
@@ -182,8 +182,8 @@ class FormMember(UserControl):
                             DataCell(Text(row['tgl_member'])),
                         DataCell(
                             Row([
-                                IconButton("delete", icon_color = "red", data = row, on_click = hapus_member ),
-                                IconButton("create", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_member),
+                                IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_member),
+                                IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row, on_click = hapus_member ),
                             ])
                         ),
                     ]
@@ -242,7 +242,7 @@ class FormMember(UserControl):
                     Text(
                         "Rekap Data Member",
                         size = 25,
-                        color = "blue",
+                        # color = "white",
                         weight = FontWeight.BOLD,
                     ),
                     alignment = alignment.center,
@@ -332,7 +332,14 @@ class Reservasi(UserControl):
         def tampil_reservasi(e):
             # Merefresh halaman & menampilkan notif
             reservasi.data_reservasi.rows.clear()
-            cursor.execute("SELECT * FROM reservasi")
+            cursor.execute("""
+                SELECT reservasi.id_reservasi, reservasi.id_pelanggan, membership.nama AS nama_pelanggan, 
+                    reservasi.tanggal_reservasi, reservasi.waktu_reservasi, 
+                    reservasi.jns_layanan, layanan.jns_layanan AS nama_layanan
+                FROM reservasi
+                JOIN membership ON reservasi.id_pelanggan = membership.id
+                JOIN layanan ON reservasi.jns_layanan = layanan.id_layanan
+            """)
             result = cursor.fetchall()
             # menampilkan ulang data 
             columns = [column[0] for column in cursor.description]
@@ -341,16 +348,16 @@ class Reservasi(UserControl):
                 reservasi.data_reservasi.rows.append(
                     DataRow(
                         cells = [
-                            DataCell(
-                            Row([
-                                IconButton("INFO_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_reservasi ),
-                                IconButton("delete", icon_color = "red", data = row, on_click = hapus_reservasi ),
-                            ])),
                             DataCell(Text(row['id_reservasi'])),
-                            DataCell(Text(row['id_pelanggan'])),
+                            DataCell(Text(f"{row['id_pelanggan']} - ({row['nama_pelanggan']})")), 
                             DataCell(Text(row['tanggal_reservasi'])),
                             DataCell(Text(row['waktu_reservasi'])),
-                            DataCell(Text(row['jns_layanan'])),
+                            DataCell(Text(f"{row['jns_layanan']} - ({row['nama_layanan']})")),
+                            DataCell(
+                            Row([
+                                IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_reservasi ),
+                                IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row, on_click = hapus_reservasi ),
+                            ])),
                         ]
                         )
                     )
@@ -417,35 +424,42 @@ class Reservasi(UserControl):
                 print("Ada yang error!")
 
         # menampilkan semua data ke dalam tabel
-        cursor.execute("SELECT * FROM reservasi")
+        cursor.execute("""
+            SELECT reservasi.id_reservasi, reservasi.id_pelanggan, membership.nama AS nama_pelanggan, 
+                reservasi.tanggal_reservasi, reservasi.waktu_reservasi, 
+                reservasi.jns_layanan, layanan.jns_layanan AS nama_layanan
+            FROM reservasi
+            JOIN membership ON reservasi.id_pelanggan = membership.id
+            JOIN layanan ON reservasi.jns_layanan = layanan.id_layanan
+        """)
         result = cursor.fetchall()
         columns = [column[0] for column in cursor.description]
         rows = [dict(zip(columns,row)) for row in result]
         reservasi.data_reservasi = DataTable(
             columns = [
-                DataColumn(Text("Opsi")),
                 DataColumn(Text("ID Reservasi")),
                 DataColumn(Text("ID Pelanggan")),
                 DataColumn(Text("Tanggal Reservasi")),
                 DataColumn(Text("Waktu Reservasi")),
                 DataColumn(Text("Jenis Layanan")),
+                DataColumn(Text("Opsi")),
             ],
         )
         for row in rows:
             reservasi.data_reservasi.rows.append(
                 DataRow(
                     cells = [
-                        DataCell(
-                            Row([
-                                IconButton("INFO_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_reservasi ),
-                                IconButton("delete", icon_color = "red", data = row, on_click = hapus_reservasi ),
-                            ])
-                            ),
                             DataCell(Text(row['id_reservasi'])),
-                            DataCell(Text(row['id_pelanggan'])),
+                            DataCell(Text(f"{row['id_pelanggan']} - ({row['nama_pelanggan']})")), 
                             DataCell(Text(row['tanggal_reservasi'])),
                             DataCell(Text(row['waktu_reservasi'])),
-                            DataCell(Text(row['jns_layanan'])),
+                            DataCell(Text(f"{row['jns_layanan']} - ({row['nama_layanan']})")),
+                            DataCell(
+                                Row([
+                                    IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_reservasi ),
+                                    IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row, on_click = hapus_reservasi ),
+                                ])
+                                ),
                     ]
                 )
             )
@@ -502,7 +516,7 @@ class Reservasi(UserControl):
                     Text(
                         "Rekap Data Reservasi",
                         size = 23,
-                        color = "blue",
+                        # color = "white",
                         weight = FontWeight.BOLD,
                     ),
                     alignment = alignment.center,
@@ -564,8 +578,8 @@ class Layanan(UserControl):
                             DataCell(Text(row['hrg_layanan'])),
                             DataCell(
                                 Row([
-                                    IconButton("delete", icon_color = "red", data = row, ),
-                                    IconButton("create", icon_color = "grey", data = row, ),
+                                    IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click=tampil_dialog_ubah_layanan ),
+                                    IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row, on_click=hapus_layanan ),
                                 ])
                             ),
                         ]
@@ -650,8 +664,8 @@ class Layanan(UserControl):
                             DataCell(Text(row['hrg_layanan'])),
                         DataCell(
                             Row([
-                                IconButton("delete", icon_color = "red", data = row, on_click = hapus_layanan ),
-                                IconButton("create", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_layanan),
+                                IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_layanan),
+                                IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row, on_click = hapus_layanan ),
                             ])
                         ),
                     ]
@@ -706,7 +720,7 @@ class Layanan(UserControl):
                     Text(
                         "Rekap Data Layanan",
                         size = 25,
-                        color = "blue",
+                        # color = "White",
                         weight = FontWeight.BOLD,
                     ),
                     alignment = alignment.center,
