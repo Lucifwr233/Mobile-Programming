@@ -4,6 +4,7 @@ import flet
 from flet import *
 import datetime
 import mysql.connector
+import json
 
 # buat koneksi ke database SQL
 koneksi_db = mysql.connector.connect(host = "localhost", user = "root", password = "", database = "fattah_crud_mobile")
@@ -750,10 +751,235 @@ class Layanan(UserControl):
 
         return layanan.layout_utama
 
+class PrivatePage(UserControl):
+    def __init__(self, page):
+        super().__init__()
+        self.page = page
+
+    def build(self):
+        # fungsi untuk mode halaman dark/light
+        def mode_tema(e):
+            self.page.theme_mode = ThemeMode.DARK if self.page.theme_mode == ThemeMode.LIGHT else ThemeMode.LIGHT
+            self.page.update()
+
+        # fungsi untuk routing / pembagian halaman
+        def route_change(route):
+            self.page.views.clear()
+            self.page.views.append(
+                View("/",
+                     [
+                         AppBar(
+                             title=Text("Aplikasi CRUD Fattah Barbershop", size=18, weight="bold", color=colors.WHITE),
+                             bgcolor=colors.BLUE_800,
+                             center_title=True,
+                         ),
+                         Column(
+                             [
+                                 Image(src="img/fattahbarbershop.png", width=180),
+                                 Column(
+                                     controls=[
+                                         ElevatedButton("Menu Reservasi", icon=icons.TABLE_ROWS, on_click=lambda _: self.page.go("/reservasi"), width=205),
+                                         ElevatedButton("Menu Membership", icon=icons.PEOPLE_ROUNDED, on_click=lambda _: self.page.go("/member"), width=205),
+                                         ElevatedButton("Menu Layanan", icon=icons.PEOPLE_ROUNDED, on_click=lambda _: self.page.go("/layanan"), width=205),
+                                         ElevatedButton("Menu Jadwal Kuliah", icon=icons.SCHEDULE_ROUNDED, on_click=lambda _: self.page.go("/jadwalkuliah"), disabled=True, width=205),
+                                     ],
+                                     width=375,
+                                     horizontal_alignment=CrossAxisAlignment.CENTER,
+                                 ),
+                             ],
+                             height=500,
+                             width=375,
+                             alignment=MainAxisAlignment.SPACE_AROUND,
+                             horizontal_alignment=CrossAxisAlignment.CENTER,
+                         ),
+                         Column(
+                             [
+                                 Column(
+                                     controls=[
+                                         ElevatedButton("Mode Warna", icon=icons.WB_SUNNY_OUTLINED, on_click=mode_tema),
+                                     ],
+                                     width=375,
+                                     horizontal_alignment=CrossAxisAlignment.CENTER,
+                                 ),
+                                 Text('Mobile Programming - Fattah Barbershop @2024', size=12)
+                             ],
+                             horizontal_alignment=CrossAxisAlignment.CENTER,
+                         ),
+                     ],
+                     )
+            )
+            if self.page.route == "/member":
+                self.page.views.append(
+                    View("/member",
+                         [
+                             AppBar(title=Text("Menu Membership", size=14, weight="bold"), bgcolor=colors.SURFACE_VARIANT),
+                             # FormMember() --> pastikan FormMember sudah terdefinisi
+                         ],
+                         )
+                )
+            if self.page.route == "/reservasi":
+                self.page.views.append(
+                    View("/reservasi",
+                         [
+                             AppBar(title=Text("Menu Reservasi", size=14, weight="bold"), bgcolor=colors.SURFACE_VARIANT),
+                             # Reservasi() --> pastikan Reservasi sudah terdefinisi
+                         ],
+                         )
+                )
+            if self.page.route == "/layanan":
+                self.page.views.append(
+                    View("/layanan",
+                         [
+                             AppBar(title=Text("Menu Layanan", size=14, weight="bold"), bgcolor=colors.SURFACE_VARIANT),
+                             # Layanan() --> pastikan Layanan sudah terdefinisi
+                         ],
+                         )
+                )
+
+            self.page.update()
+
+        # fungsi untuk pop up halaman
+        def view_pop(view):
+            self.page.views.pop()
+            top_view = self.page.views[-1]
+            self.page.go(top_view.route)
+
+        def logoutbtn(e):
+            self.page.session.clear()
+            self.page.go("/")
+            self.page.update()
+
+        self.page.on_route_change = route_change
+        self.page.on_view_pop = view_pop
+        self.page.go(self.page.route)
+
+
+class MyLogin(UserControl):
+    def __init__(self):
+        super(MyLogin, self).__init__()
+        self.username = TextField(label="username")
+        self.password = TextField(label="password", password=True)
+
+    def build(self):
+        return Container(
+            bgcolor="yellow200",
+            padding=10,
+            content=Column([
+                Text("Login Account", size=30),
+                self.username,
+                self.password,
+                ElevatedButton(
+                    "Login Now",
+                    bgcolor="blue",
+                    color="white",
+                    on_click=self.loginbtn
+                ),
+                ElevatedButton(
+                    "Register",
+                    bgcolor="blue",
+                    color="white",
+                    on_click=self.registerbtn
+                ),
+            ])
+        )
+
+    def registerbtn(self, e):
+        self.page.go("/register")
+        self.page.update()
+
+    def loginbtn(self, e):
+        try:
+            with open("login-test/login.json", "r") as f:
+                try:
+                    data = json.load(f)
+                except json.JSONDecodeError:
+                    data = {"users": []}
+
+                username = self.username.value
+                password = self.password.value
+
+                user_found = any(user["username"] == username and user["password"] == password for user in data["users"])
+
+                if user_found:
+                    print("Login Success")
+
+                    datalogin = {
+                        "value": True,
+                        "username": self.username.value
+                    }
+
+                    self.page.session.set("login", datalogin)
+                    self.page.go("/privatepage")
+                    self.page.update()
+                else:
+                    print("Login Failed")
+                    self.page.snack_bar = SnackBar(
+                        Text("Login Failed", size=30),
+                        bgcolor="red"
+                    )
+                    self.page.snack_bar.open = True
+                    self.page.update()
+        except Exception as ex:
+            print(f"Error: {ex}")
+            self.page.snack_bar = SnackBar(
+                Text("Error occurred while logging in", size=30),
+                bgcolor="red"
+            )
+            self.page.snack_bar.open = True
+            self.page.update()
+
+
+class MyRegister(UserControl):
+    def __init__(self):
+        super(MyRegister, self).__init__()
+        self.username = TextField(label="username")
+        self.password = TextField(label="password", password=True)
+
+    def build(self):
+        return Container(
+            bgcolor="green",
+            padding=10,
+            content=Column([
+                Text("Register", size=30),
+                self.username,
+                self.password,
+                ElevatedButton("Register", on_click=self.registerprocess)
+            ])
+        )
+
+    def registerprocess(self, e):
+        new_user = {
+            "username": self.username.value,
+            "password": self.password.value,
+        }
+
+        try:
+            try:
+                with open("login-test/login.json", "r") as f:
+                    data = json.load(f)
+            except (FileNotFoundError, json.JSONDecodeError):
+                data = {"users": []}
+
+            data["users"].append(new_user)
+
+            with open("login-test/login.json", "w") as f:
+                json_string = json.dumps(data, indent=4)
+                f.write(json_string)
+
+            self.page.go("/")
+            self.page.update()
+        except Exception as ex:
+            print(f"Error: {ex}")
+            self.page.snack_bar = SnackBar(
+                Text("Error occurred while registering", size=30),
+                bgcolor="red"
+            )
+            self.page.snack_bar.open = True
+            self.page.update()
 
 
 # fungsi utama
-def main (page : Page):
+def main(page: Page):
     # mengatur halaman
     page.title = "Fattah Barbershop"
     page.window_width = 350
@@ -762,103 +988,28 @@ def main (page : Page):
     page.window_maximizable = False
     page.window_minimizable = True
     page.scroll = "adaptive"
-    #page.theme_mode = "light"
     page.theme_mode = ThemeMode.DARK
 
-    # fungsi untuk mode halaman dark/light
-    def mode_tema(e):
-        page.theme_mode = "dark" if page.theme_mode =="light" else "light"
-        page.update()
+    mylogin = MyLogin()
+    privatepage = PrivatePage(page)
+    registerpage = MyRegister()
 
-    # fungsi untuk routing / pembagian halaman
-    def route_change(route):
+    def myroute(route):
         page.views.clear()
-        page.views.append(
-            View("/",
-                [
-                    AppBar(
-                        title = Text("Aplikasi CRUD Fattah Barbershop", size = 18, weight = FontWeight.BOLD, color = colors.WHITE), 
-                        bgcolor = colors.BLUE_800, 
-                        center_title = True,
-                    ),
-                    Column(
-                        [
-                            Image(src="img/fattahbarbershop.png",width=180 ),
-                            # Icon(name = icons.CAST_FOR_EDUCATION, color = colors.BLUE, size = 180),
-                            Column(
-                                controls = [
-                                    ElevatedButton("Menu Reservasi", icon = icons.TABLE_ROWS, on_click = lambda _: page.go("/reservasi"), width=205),
-                                    ElevatedButton("Menu Membership", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/member"), width=205 ),
-                                    ElevatedButton("Menu Layanan", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/layanan"), width=205 ),
-                                    ElevatedButton("Menu Jadwal Kuliah", icon = icons.SCHEDULE_ROUNDED, on_click = lambda _: page.go("/jadwalkuliah"), disabled=True, width=205 ),
-                                ],
-                                width = 375,
-                                horizontal_alignment = CrossAxisAlignment.CENTER,
-                            ),
-
-                        ],
-                        height = 500,
-                        width = 375,
-                        alignment = MainAxisAlignment.SPACE_AROUND,
-                        horizontal_alignment = CrossAxisAlignment.CENTER,
-                    ),
-                    Column(
-                        [
-                            Column(
-                                controls = [
-                                    ElevatedButton("Mode Warna", icon = icons.WB_SUNNY_OUTLINED, on_click = mode_tema),
-                                ],
-                                width = 375,
-                                horizontal_alignment = CrossAxisAlignment.CENTER,
-                            ),
-                            Text('Mobile Programming - Fattah Barbershop @2024', size = 12)
-                        ],
-                        horizontal_alignment = CrossAxisAlignment.CENTER,
-                    ),
-                    
-                ],
-            )
-        )
-        if page.route == "/member":
-            page.views.append(
-                View("/member",
-                    [
-                        AppBar(title = Text("Menu Membership", size = 14, weight = FontWeight.BOLD), bgcolor = colors.SURFACE_VARIANT ),
-                        FormMember()
-                    ],
-                )
-            )
-        if page.route == "/reservasi":
-            page.views.append(
-                View("/reservasi",
-                    [
-                        AppBar(title = Text("Menu Reservasi", size = 14, weight = FontWeight.BOLD), bgcolor = colors.SURFACE_VARIANT ),
-                        Reservasi()
-                    ],
-                )
-            )
-        if page.route == "/layanan":
-            page.views.append(
-                View("/layanan",
-                    [
-                        AppBar(title = Text("Menu Layanan", size = 14, weight = FontWeight.BOLD), bgcolor = colors.SURFACE_VARIANT),
-                        Layanan()
-                    ],
-                )
-            )
-        
+        if page.route == "/":
+            page.views.append(View("/", [mylogin]))
+        elif page.route == "/privatepage":
+            if page.session.get("login") is None:
+                page.go("/")
+            else:
+                page.views.append(View("/privatepage", [privatepage]))
+        elif page.route == "/register":
+            page.views.append(View("/register", [registerpage]))
         page.update()
 
-    # fungsi untuk pop up halaman
-    def view_pop(view):
-        page.views.pop()
-        top_view = page.views[-1]
-        page.go(top_view.route)
-
-    page.on_route_change = route_change
-    page.on_view_pop = view_pop
+    page.on_route_change = myroute
     page.go(page.route)
 
 
 # mengatur output aplikasi
-flet.app(target = main)
+flet.app(target=main)
