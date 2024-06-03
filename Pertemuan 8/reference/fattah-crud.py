@@ -335,7 +335,8 @@ class Reservasi(UserControl):
             cursor.execute("""
                 SELECT reservasi.id_reservasi, reservasi.id_pelanggan, membership.nama AS nama_pelanggan, 
                     reservasi.tanggal_reservasi, reservasi.waktu_reservasi, 
-                    reservasi.jns_layanan, layanan.jns_layanan AS nama_layanan
+                    reservasi.jns_layanan, layanan.jns_layanan AS nama_layanan,
+                    layanan.hrg_layanan AS harga_layanan
                 FROM reservasi
                 JOIN membership ON reservasi.id_pelanggan = membership.id
                 JOIN layanan ON reservasi.jns_layanan = layanan.id_layanan
@@ -353,6 +354,7 @@ class Reservasi(UserControl):
                             DataCell(Text(row['tanggal_reservasi'])),
                             DataCell(Text(row['waktu_reservasi'])),
                             DataCell(Text(f"{row['jns_layanan']} - ({row['nama_layanan']})")),
+                            DataCell(Text(row['harga_layanan'])),
                             DataCell(
                             Row([
                                 IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_reservasi ),
@@ -427,7 +429,8 @@ class Reservasi(UserControl):
         cursor.execute("""
             SELECT reservasi.id_reservasi, reservasi.id_pelanggan, membership.nama AS nama_pelanggan, 
                 reservasi.tanggal_reservasi, reservasi.waktu_reservasi, 
-                reservasi.jns_layanan, layanan.jns_layanan AS nama_layanan
+                reservasi.jns_layanan, layanan.jns_layanan AS nama_layanan,
+                layanan.hrg_layanan AS harga_layanan
             FROM reservasi
             JOIN membership ON reservasi.id_pelanggan = membership.id
             JOIN layanan ON reservasi.jns_layanan = layanan.id_layanan
@@ -442,6 +445,7 @@ class Reservasi(UserControl):
                 DataColumn(Text("Tanggal Reservasi")),
                 DataColumn(Text("Waktu Reservasi")),
                 DataColumn(Text("Jenis Layanan")),
+                DataColumn(Text("Total Harga")),
                 DataColumn(Text("Opsi")),
             ],
         )
@@ -454,6 +458,7 @@ class Reservasi(UserControl):
                             DataCell(Text(row['tanggal_reservasi'])),
                             DataCell(Text(row['waktu_reservasi'])),
                             DataCell(Text(f"{row['jns_layanan']} - ({row['nama_layanan']})")),
+                            DataCell(Text(row['harga_layanan'])),
                             DataCell(
                                 Row([
                                     IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_reservasi ),
@@ -790,7 +795,7 @@ def main (page : Page):
                                     ElevatedButton("Menu Reservasi", icon = icons.TABLE_ROWS, on_click = lambda _: page.go("/reservasi"), width=205),
                                     ElevatedButton("Menu Membership", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/member"), width=205 ),
                                     ElevatedButton("Menu Layanan", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/layanan"), width=205 ),
-                                    ElevatedButton("Menu Jadwal Kuliah", icon = icons.SCHEDULE_ROUNDED, on_click = lambda _: page.go("/jadwalkuliah"), disabled=True, width=205 ),
+                                    ElevatedButton("Menu Jadwal Kuliah", icon = icons.SCHEDULE_ROUNDED, on_click = lambda _: page.go("/jadwalkuliah"), disabled=True, width=205, visible=False ),
                                 ],
                                 width = 375,
                                 horizontal_alignment = CrossAxisAlignment.CENTER,
