@@ -91,7 +91,7 @@ def main(page:Page):
 	datanotfound = Text("YOu search Not found...",
 		weight="bold",
 		size=20
-	)		
+	)
  
 	# SET DEFAULT IS FALSE 
 	datanotfound.visible = False

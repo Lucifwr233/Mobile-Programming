@@ -808,7 +808,7 @@ def main (page : Page):
                             ),
 
                         ],
-                        height = 500 ,
+                        height = 500,
                         width = 375,
                         alignment = MainAxisAlignment.SPACE_AROUND,
                         horizontal_alignment = CrossAxisAlignment.CENTER,
