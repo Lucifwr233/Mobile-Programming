@@ -279,6 +279,9 @@ class Reservasi(UserControl):
     # class untuk halaman mata kuliah
     def build(reservasi) :
 
+        def format_rupiah(angka):
+            return f"Rp {angka:,.0f}".replace(',', '.')
+
         # tgl lhr reservasi
         def ubah_tanggal_lhr(e):
             tgl_baru = reservasi.opsi_tanggal.value
@@ -325,7 +328,7 @@ class Reservasi(UserControl):
         reservasi.inputan_waktu_reservasi = TextField(label = "Waktu Reservasi", hint_text = "Waktu Reservasi", expand = True)
 
         cursor.execute("SELECT * FROM layanan")
-        reservasi.inputan_jenis_layanan= Dropdown(label = "Jenis Layanan", hint_text = "Jenis", expand = True, options=[dropdown.Option(row[0],row[1] + " - " + row[2]) for row in cursor.fetchall()],)
+        reservasi.inputan_jenis_layanan= Dropdown(label = "Jenis Layanan", hint_text = "Jenis", expand = True, options=[dropdown.Option(row[0], f"{row[1]} - {row[2]}") for row in cursor.fetchall()],)
         reservasi.snack_bar_berhasil = SnackBar( Text("Operasi berhasil"), bgcolor="green")
 
         # memuat tabel data
@@ -354,7 +357,7 @@ class Reservasi(UserControl):
                             DataCell(Text(row['tanggal_reservasi'])),
                             DataCell(Text(row['waktu_reservasi'])),
                             DataCell(Text(f"{row['jns_layanan']} - ({row['nama_layanan']})")),
-                            DataCell(Text(row['harga_layanan'])),
+                            DataCell(Text(format_rupiah(row['harga_layanan']))),
                             DataCell(
                             Row([
                                 IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_reservasi ),
@@ -458,7 +461,7 @@ class Reservasi(UserControl):
                             DataCell(Text(row['tanggal_reservasi'])),
                             DataCell(Text(row['waktu_reservasi'])),
                             DataCell(Text(f"{row['jns_layanan']} - ({row['nama_layanan']})")),
-                            DataCell(Text(row['harga_layanan'])),
+                            DataCell(Text(format_rupiah(row['harga_layanan']))),
                             DataCell(
                                 Row([
                                     IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_reservasi ),
@@ -559,6 +562,9 @@ class Layanan(UserControl):
     # class untuk halaman mata kuliah
     def build(layanan) :
 
+        def format_rupiah(angka):
+            return f"Rp {angka:,.0f}".replace(',', '.')
+
         # buat variabel inputan
         layanan.inputan_id_layanan= TextField(visible = False, expand = True)
         layanan.inputan_jenis_layanan= TextField(label = "Jenis Layanan", hint_text = "Jenis", expand = True )
@@ -580,7 +586,7 @@ class Layanan(UserControl):
                         cells = [
                             DataCell(Text(row['id_layanan'])),
                             DataCell(Text(row['jns_layanan'])),
-                            DataCell(Text(row['hrg_layanan'])),
+                            DataCell(Text(format_rupiah(row['hrg_layanan']))),
                             DataCell(
                                 Row([
                                     IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click=tampil_dialog_ubah_layanan ),
@@ -666,7 +672,7 @@ class Layanan(UserControl):
                     cells = [
                             DataCell(Text(row['id_layanan'])),
                             DataCell(Text(row['jns_layanan'])),
-                            DataCell(Text(row['hrg_layanan'])),
+                            DataCell(Text(format_rupiah(row['hrg_layanan']))),
                         DataCell(
                             Row([
                                 IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_layanan),
