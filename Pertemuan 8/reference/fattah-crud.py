@@ -792,9 +792,9 @@ def main (page : Page):
                         bgcolor = colors.BLUE_800, 
                         center_title = True,
                     ),
-                    Column(
+                    Column( 
                         [
-                            Image(src="img/fattahbarbershop.png",width=180 ),
+                            Image(src="reference/fattahbarbershop.png",width=180 ),
                             # Icon(name = icons.CAST_FOR_EDUCATION, color = colors.BLUE, size = 180),
                             Column(
                                 controls = [
