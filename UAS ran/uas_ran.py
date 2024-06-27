@@ -582,7 +582,7 @@ class FormPembeli(UserControl):
             columns = [column[0] for column in cursor.description]
             rows = [dict(zip(columns,row)) for row in result]
             for row in rows:
-                pembeli.data_layanan.rows.append(
+                pembeli.data_pembeli.rows.append(
                     DataRow(
                         cells = [
                             DataCell(Text(row['id_pembeli'])),
@@ -690,17 +690,18 @@ class FormPembeli(UserControl):
             )
 
         # buat variabel utk layout data rekapan
-        layanan.layout_data = Column()
+        pembeli.layout_data = Column()
 
         # buat form dialog untuk form entri data
-        layanan.dialog = BottomSheet(
+        pembeli.dialog = BottomSheet(
             Container(
                 Column(
                     [
-                        Text("Form Entri Data Layanan", weight = FontWeight.BOLD),
-                        Row([ layanan.inputan_id_layanan ]),
-                        Row([ layanan.inputan_jenis_layanan ]),
-                        Row([ layanan.inputan_harga_layanan ]),
+                        Text("Form Entri Data Pembeli", weight = FontWeight.BOLD),
+                        Row([ pembeli.inputan_id_pembeli ]),
+                        Row([ pembeli.inputan_nama_pembeli ]),
+                        Row([ pembeli.inputan_jk_pembeli ]),
+                        Row([ pembeli.inputan_alamat ]),
                         Row([
                             #tombol tambah data
                             ElevatedButton(
@@ -711,7 +712,7 @@ class FormPembeli(UserControl):
                                     bgcolor = "blue",
                                     width =  250,
                                     height = 50,
-                                    on_click = simpan_layanan,
+                                    on_click = simpan_pembeli,
                                 )
                         ]),
                     ],
@@ -731,11 +732,11 @@ class FormPembeli(UserControl):
         )
 
    # buat variabel tampilan layout utama
-        layanan.layout_utama = Column(
+        pembeli.layout_utama = Column(
             [
                 Container(
                     Text(
-                        "Rekap Data Layanan",
+                        "Rekap Data Pembeli",
                         size = 25,
                         # color = "White",
                         weight = FontWeight.BOLD,
@@ -751,28 +752,28 @@ class FormPembeli(UserControl):
                         color = "white",
                         bgcolor = "blue",
                         width = 200,
-                        on_click = tampil_dialog_layanan,
+                        on_click = tampil_dialog_pembeli,
                     ),
                     alignment = alignment.center,
                     padding = 10,
                 ),
                 Row(
-                    [layanan.data_layanan], scroll=ScrollMode.ALWAYS
+                    [pembeli.data_pembeli], scroll=ScrollMode.ALWAYS
                 ),
-                layanan.layout_data,
-                layanan.snack_bar_berhasil,
-                layanan.dialog,
+                pembeli.layout_data,
+                pembeli.snack_bar_berhasil,
+                pembeli.dialog,
             ]
         )
 
-        return layanan.layout_utama
+        return pembeli.layout_utama
 
 
 
 # fungsi utama
 def main (page : Page):
     # mengatur halaman
-    page.title = "Fattah Barbershop"
+    page.title = "Penjualan Sembako"
     page.window_width = 350
     page.window_height = 700
     page.window_resizable = False
@@ -794,19 +795,19 @@ def main (page : Page):
             View("/",
                 [
                     AppBar(
-                        title = Text("Aplikasi CRUD Fattah Barbershop", size = 18, weight = FontWeight.BOLD, color = colors.WHITE), 
+                        title = Text("Aplikasi CRUD Penjualan Sembako", size = 18, weight = FontWeight.BOLD, color = colors.WHITE), 
                         bgcolor = colors.BLUE_800, 
                         center_title = True,
                     ),
                     Column( 
                         [
-                            Image(src="reference/fattahbarbershop.png",width=180 ),
+                            Image(src="reference/ssss.png",width=180 ),
                             # Icon(name = icons.CAST_FOR_EDUCATION, color = colors.BLUE, size = 180),
                             Column(
                                 controls = [
                                     ElevatedButton("Menu Reservasi", icon = icons.TABLE_ROWS, on_click = lambda _: page.go("/reservasi"), width=205),
                                     ElevatedButton("Menu Membership", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/member"), width=205 ),
-                                    ElevatedButton("Menu Layanan", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/layanan"), width=205 ),
+                                    ElevatedButton("Menu Pembeli", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/pembeli"), width=205 ),
                                     ElevatedButton("Menu Jadwal Kuliah", icon = icons.SCHEDULE_ROUNDED, on_click = lambda _: page.go("/jadwalkuliah"), disabled=True, width=205, visible=False ),
                                 ],
                                 width = 375,
@@ -854,12 +855,12 @@ def main (page : Page):
                     ],
                 )
             )
-        if page.route == "/layanan":
+        if page.route == "/pembeli":
             page.views.append(
-                View("/layanan",
+                View("/pembeli",
                     [
                         AppBar(title = Text("Menu Layanan", size = 14, weight = FontWeight.BOLD), bgcolor = colors.SURFACE_VARIANT),
-                        Layanan()
+                        FormPembeli()
                     ],
                 )
             )
