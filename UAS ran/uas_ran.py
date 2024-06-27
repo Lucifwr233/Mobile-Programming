@@ -871,7 +871,7 @@ def main (page : Page):
                     ),
                     Column( 
                         [
-                            Image(src="reference/ssss.png",width=180 ),
+                            Image(src="image.png",width=200 ),
                             # Icon(name = icons.CAST_FOR_EDUCATION, color = colors.BLUE, size = 180),
                             Column(
                                 controls = [
