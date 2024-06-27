@@ -9,79 +9,39 @@ import mysql.connector
 koneksi_db = mysql.connector.connect(host = "localhost", user = "root", password = "", database = "mp_uas")
 cursor = koneksi_db.cursor()
 
-class FormMember(UserControl):
+class FormSembako(UserControl):
     # class untuk halaman mata kuliah
-    def build(member) :
-
-        # tgl lhr member
-        def ubah_tanggal_lhr(e):
-            tgl_baru = member.opsi_tanggal.value
-            member.inputan_tgl_lahir.value = tgl_baru.date()
-            member.update()
-            
-        def opsi_tanggal_lhr_dismissed(e):
-            tgl_baru = member.inputan_tgl_lahir.value
-            member.inputan_tgl_lahir.value = tgl_baru
-            member.update()
-        
-        member.opsi_tanggal = DatePicker(
-            on_change=ubah_tanggal_lhr,
-            on_dismiss=opsi_tanggal_lhr_dismissed,
-            first_date=datetime.datetime(2023, 10, 1),
-            last_date=datetime.datetime(2024, 10, 1),
-        )
-
-        # tgl member join
-        def ubah_tanggal_lhr_member(e):
-            tgl_baru = member.opsi_tanggal_member.value
-            member.inputan_tgl_member.value = tgl_baru.date()
-            member.update()
-            
-        def opsi_tanggal_lhr_dismissed_member(e):
-            tgl_baru = member.inputan_tgl_member.value
-            member.inputan_tgl_member.value = tgl_baru
-            member.update()
-        
-        member.opsi_tanggal_member = DatePicker(
-            on_change=ubah_tanggal_lhr_member,
-            on_dismiss=opsi_tanggal_lhr_dismissed_member,
-            first_date=datetime.datetime(2023, 10, 1),
-            last_date=datetime.datetime(2024, 10, 1),
-        )
+    def build(sembako) :
         # buat variabel inputan
-        member.inputan_id = TextField(visible = False, expand = True)
-        member.inputan_nama = TextField(label = "Nama", hint_text = "Nama", expand = True)
-        member.inputan_jekel = Dropdown(label = "JeKel", hint_text = "Lk or PR ", expand = True, options=[dropdown.Option("Laki-laki"), dropdown.Option("Perempuan")],)
-        member.inputan_tgl_lahir = TextField(label = "Tanggal lahir", hint_text = "Tgl Lahir", expand = True)
-        member.inputan_alamat = TextField(label = "Alamat Member", hint_text = "Alamat Member", expand = True)
-        member.inputan_telp = TextField(label = "Telepon", hint_text = "Telepon", expand = True)
-        member.inputan_tgl_member = TextField(label = "Tanggal Member", hint_text = "Tanggal Gabung Member", expand = True)
-        member.snack_bar_berhasil = SnackBar( Text("Operasi berhasil"), bgcolor="green")
+        sembako.inputan_id_sembako = TextField(visible = False, expand = True)
+        sembako.inputan_nama_sembako = TextField(label = "Nama Sembako", hint_text = "Nama Sembako", expand = True)
+        sembako.inputan_harga = TextField(label = "Harga", hint_text = "Harga", expand = True)
+        sembako.inputan_quantity = TextField(label = "Quantity", hint_text = "Quantity", expand = True)
+        member.inputan_satuan = Dropdown(label = "Satuan", hint_text = "Satuan", expand = True, options=[dropdown.Option("Kg"), dropdown.Option("Ltr")],)
+        sembako.snack_bar_berhasil = SnackBar( Text("Operasi berhasil"), bgcolor="green")
 
         # memuat tabel data
-        def tampil_member(e):
+        def tampil_sembako(e):
             # Merefresh halaman & menampilkan notif
-            member.data_member.rows.clear()
-            cursor.execute("SELECT * FROM membership")
+            sembako.data_sembako.rows.clear()
+            cursor.execute("SELECT * FROM sembako")
             result = cursor.fetchall()
             # menampilkan ulang data 
             columns = [column[0] for column in cursor.description]
             rows = [dict(zip(columns,row)) for row in result]
             for row in rows:
-                member.data_member.rows.append(
+                sembako.data_sembako.rows.append(
                     DataRow(
                         cells = [
-                            DataCell(Text(row['id'])),
-                            DataCell(Text(row['nama'])),
-                            DataCell(Text(row['jekel'])),
-                            DataCell(Text(row['tgl_lahir'])),
-                            DataCell(Text(row['alamat'])),
-                            DataCell(Text(row['telp'])),
-                            DataCell(Text(row['tgl_member'])),
+                            DataCell(Text(row['id_sembako'])),
+                            DataCell(Text(row['nama_sembako'])),
+                            DataCell(Text(row['harga'])),
+                            DataCell(Text(row['quantity'])),
+                            DataCell(Text(row['satuan'])),
                             DataCell(
                                 Row([
-                                    IconButton("EDIT_OUTLINED", icon_color = "grey", data = row,on_click=tampil_dialog_ubah_member ),
-                                    IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row,on_click=hapus_member ),
+                                    IconButton("EDIT_OUTLINED", icon_color = "grey", data = row,on_click=tampil_dialog_ubah_sembako ),
+                                    IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row,on_click=hapus_sembako ),
                                 ])
                             ),
                         ]
@@ -89,65 +49,61 @@ class FormMember(UserControl):
                     )
 
         # fungsi menampilkan dialog form entri
-        def tampil_dialog_member(e):
-            member.inputan_id.value = ''
-            member.inputan_nama.value = ''
-            member.inputan_jekel.value = ''
-            member.inputan_tgl_lahir.value = ''
-            member.inputan_alamat.value = ''
-            member.inputan_telp.value = ''
-            member.inputan_tgl_member.value = ''
-            member.dialog.open = True
-            member.update()
+        def tampil_dialog_sembako(e):
+            sembako.inputan_id_sembako.value = ''
+            sembako.inputan_nama_sembako.value = ''
+            sembako.inputan_harga.value = ''
+            sembako.inputan_quantity.value = ''
+            sembako.inputan_satuan.value = ''
+            sembako.dialog.open = True
+            sembako.update()
 
-        def tampil_dialog_ubah_member(e):
-            member.inputan_id.value = e.control.data['id']
-            member.inputan_nama.value = e.control.data['nama']
-            member.inputan_jekel.value = e.control.data['jekel']
-            member.inputan_tgl_lahir.value = e.control.data['tgl_lahir']
-            member.inputan_alamat.value = e.control.data['alamat']
-            member.inputan_telp.value = e.control.data['telp']
-            member.inputan_tgl_member.value = e.control.data['tgl_member']
-            member.dialog.open = True
-            member.update()
+        def tampil_dialog_ubah_sembako(e):
+            sembako.inputan_id_sembako.value = e.control.data['id_sembako']
+            sembako.inputan_nama_sembako.value = e.control.data['nama_sembako']
+            sembako.inputan_harga.value = e.control.data['harga']
+            sembako.inputan_quantity.value = e.control.data['quantity']
+            sembako.inputan_satuan.value = e.control.data['satuan']
+            sembako.dialog.open = True
+            sembako.update()
 
         # fungsi simpan data
-        def simpan_member(e):
+        def simpan_sembako(e):
             try:
-                if (member.inputan_id.value == '') :
-                    sql = "INSERT INTO membership (id, nama, jekel, tgl_lahir, alamat, telp, tgl_member) VALUES(%s, %s, %s, %s, %s, %s, %s)"
-                    val = (member.inputan_id.value, member.inputan_nama.value, member.inputan_jekel.value, member.inputan_tgl_lahir.value, member.inputan_alamat.value, member.inputan_telp.value, member.inputan_tgl_member.value)
+                if (sembako.inputan_id_sembako.value == '') :
+                    sql = "INSERT INTO membership (id_sembako, nama_sembako, harga, quantity, satuan) VALUES(%s, %s, %s, %s, %s)"
+                    val = (sembako.inputan_id_sembako.value, sembako.inputan_nama_sembako.value, sembako.inputan_harga.value, sembako.inputan_quantity.value, sembako.inputan_satuan.value)
                 else :
-                    sql = "UPDATE membership SET nama = %s, jekel = %s, tgl_lahir = %s, alamat = %s, telp = %s, tgl_member = %s WHERE id = %s"
-                    val = (member.inputan_nama.value, member.inputan_jekel.value, member.inputan_tgl_lahir.value, member.inputan_alamat.value, member.inputan_telp.value, member.inputan_tgl_member.value,  member.inputan_id.value)
+                    sql = "UPDATE membership SET nama_sembako = %s, harga = %s, quantity = %s, satuan = %s, WHERE id_sembako = %s"
+                    val = (sembako.inputan_nama_sembako.value, sembako.inputan_harga.value, sembako.inputan_quantity.value, sembako.inputan_satuan.value, sembako.inputan_id_sembako.value)
                     
                 cursor.execute(sql, val)
                 koneksi_db.commit()
                 print(cursor.rowcount, "Data di simpan!")
 
-                tampil_member(e)
-                member.dialog.open = False
-                member.snack_bar_berhasil.open = True
-                member.update()
+                tampil_sembako(e)
+                sembako.dialog.open = False
+                sembako.snack_bar_berhasil.open = True
+                sembako.update()
             except Exception as e:
                 print(e)
                 print("Ada yang error!")
 
 
         # fungsi hapus data
-        def hapus_member(e):
+        def hapus_sembako(e):
             try:
-                sql = "DELETE FROM membership WHERE id = %s"
-                val = (e.control.data['id'],)
+                sql = "DELETE FROM sembako WHERE id = %s"
+                val = (e.control.data['id_sembako'],)
                 cursor.execute(sql, val)
                 koneksi_db.commit()
                 print(cursor.rowcount, "data di hapus!")
-                member.data_member.rows.clear()
+                sembako.data_sembako.rows.clear()
                 
-                tampil_member(e)
-                member.dialog.open = False
-                member.snack_bar_berhasil.open = True
-                member.update()
+                tampil_sembako(e)
+                sembako.dialog.open = False
+                sembako.snack_bar_berhasil.open = True
+                sembako.update()
             except Exception as e:
                 print(e)
                 print("Ada yang error!")
