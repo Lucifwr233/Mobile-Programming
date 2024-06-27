@@ -225,197 +225,192 @@ class FormSembako(UserControl):
         return sembako.layout_utama
 
 
-class Reservasi(UserControl):
+class FormPenjualan(UserControl):
     # class untuk halaman mata kuliah
-    def build(reservasi) :
+    def build(penjualan) :
 
         def format_rupiah(angka):
             return f"Rp {angka:,.0f}".replace(',', '.')
 
-        # tgl lhr reservasi
+        # tgl lhr penjualan
         def ubah_tanggal_lhr(e):
-            tgl_baru = reservasi.opsi_tanggal.value
-            reservasi.inputan_tanggal_reservasi.value = tgl_baru.date()
-            reservasi.update()
+            tgl_baru = penjualan.opsi_tanggal.value
+            penjualan.inputan_tanggal_penjualan.value = tgl_baru.date()
+            penjualan.update()
             
         def opsi_tanggal_lhr_dismissed(e):
-            tgl_baru = reservasi.inputan_tanggal_reservasi.value
-            reservasi.inputan_tanggal_reservasi.value = tgl_baru
-            reservasi.update()
+            tgl_baru = penjualan.inputan_tanggal_penjualan.value
+            penjualan.inputan_tanggal_penjualan.value = tgl_baru
+            penjualan.update()
         
-        reservasi.opsi_tanggal = DatePicker(
+        penjualan.opsi_tanggal = DatePicker(
             on_change=ubah_tanggal_lhr,
             on_dismiss=opsi_tanggal_lhr_dismissed,
             first_date=datetime.datetime(2023, 10, 1),
             last_date=datetime.datetime(2024, 10, 1),
         )
 
-        #input jam
-        def ubah_jam(e):
-            jam_baru = reservasi.opsi_jam.value
-            reservasi.inputan_waktu_reservasi.value = jam_baru.strftime('%H:%M')
-            reservasi.update()
+        # #input jam
+        # def ubah_jam(e):
+        #     jam_baru = reservasi.opsi_jam.value
+        #     reservasi.inputan_waktu_reservasi.value = jam_baru.strftime('%H:%M')
+        #     reservasi.update()
 
-        def ubah_jam_dismissed(e):
-            jam_baru = reservasi.inputan_waktu_reservasi.value
-            reservasi.inputan_waktu_reservasi.value = jam_baru
-            reservasi.update()
+        # def ubah_jam_dismissed(e):
+        #     jam_baru = reservasi.inputan_waktu_reservasi.value
+        #     reservasi.inputan_waktu_reservasi.value = jam_baru
+        #     reservasi.update()
 
-        reservasi.opsi_jam = TimePicker(
-            confirm_text="Confirm",
-            error_invalid_text="Time out of range",
-            help_text="Pick your time slot",
-            on_change=ubah_jam,
-            on_dismiss=ubah_jam_dismissed,
-        )
+        # reservasi.opsi_jam = TimePicker(
+        #     confirm_text="Confirm",
+        #     error_invalid_text="Time out of range",
+        #     help_text="Pick your time slot",
+        #     on_change=ubah_jam,
+        #     on_dismiss=ubah_jam_dismissed,
+        # )
 
         # buat variabel inputan
-        reservasi.inputan_id_reservasi= TextField(visible = False, expand = True)
+        penjualan.inputan_id_penjualan= TextField(visible = False, expand = True)
+        penjualan.inputan_tanggal_penjualan = TextField(label = "Tanggal Penjualan", hint_text = "Tanggal Penjualan", expand = True)
+        penjualan.inputan_kasir = TextField(label = "Kasir", hint_text = "Kasir", expand = True)
 
-        cursor.execute("SELECT * FROM membership")
-        reservasi.inputan_id_pelanggan = Dropdown(label = "Nama Pelanggan", hint_text = "Nama Pelanggan", expand = True, options=[dropdown.Option(row[0],row[1] + " - " + row[2]) for row in cursor.fetchall()])
-        reservasi.inputan_tanggal_reservasi = TextField(label = "Tanggal Reservasi", hint_text = "Tanggal Reservasi", expand = True)
-        reservasi.inputan_waktu_reservasi = TextField(label = "Waktu Reservasi", hint_text = "Waktu Reservasi", expand = True)
+        cursor.execute("SELECT * FROM pembeli")
+        penjualan.inputan_id_pembeli= Dropdown(label = "Nama Pembeli", hint_text = "Nama Pembeli", expand = True, options=[dropdown.Option(row[0], f"{row[1]} - {row[2]}") for row in cursor.fetchall()],)
 
-        cursor.execute("SELECT * FROM layanan")
-        reservasi.inputan_jenis_layanan= Dropdown(label = "Jenis Layanan", hint_text = "Jenis", expand = True, options=[dropdown.Option(row[0], f"{row[1]} - {row[2]}") for row in cursor.fetchall()],)
-        reservasi.snack_bar_berhasil = SnackBar( Text("Operasi berhasil"), bgcolor="green")
+        cursor.execute("SELECT * FROM sembako")
+        penjualan.inputan_id_sembako = Dropdown(label = "Nama Sembako", hint_text = "Nama Sembako", expand = True, options=[dropdown.Option(row[0], f"{row[1]} - {row[2]}") for row in cursor.fetchall()])
+        penjualan.snack_bar_berhasil = SnackBar( Text("Operasi berhasil"), bgcolor="green")
 
         # memuat tabel data
-        def tampil_reservasi(e):
+        def tampil_penjualan(e):
             # Merefresh halaman & menampilkan notif
-            reservasi.data_reservasi.rows.clear()
+            penjualan.data_penjualan.rows.clear()
             cursor.execute("""
-                SELECT reservasi.id_reservasi, reservasi.id_pelanggan, membership.nama AS nama_pelanggan, 
-                    reservasi.tanggal_reservasi, reservasi.waktu_reservasi, 
-                    reservasi.jns_layanan, layanan.jns_layanan AS nama_layanan,
-                    layanan.hrg_layanan AS harga_layanan
-                FROM reservasi
-                JOIN membership ON reservasi.id_pelanggan = membership.id
-                JOIN layanan ON reservasi.jns_layanan = layanan.id_layanan
+                SELECT penjualan.id_penjualan, penjualan.tanggal, penjualan.kasir, 
+                    pembeli.id_pembeli, pembeli.nama_pembeli,
+                    sembako.id_sembako, sembako.nama_sembako
+                FROM penjualan
+                JOIN pembeli ON penjualan.id_pembeli = pembeli.id_pembeli
+                JOIN sembako ON penjualan.id_sembako = sembako.id_sembako
             """)
             result = cursor.fetchall()
             # menampilkan ulang data 
             columns = [column[0] for column in cursor.description]
             rows = [dict(zip(columns,row)) for row in result]
             for row in rows:
-                reservasi.data_reservasi.rows.append(
+                penjualan.data_penjualan.rows.append(
                     DataRow(
                         cells = [
-                            DataCell(Text(row['id_reservasi'])),
-                            DataCell(Text(f"{row['id_pelanggan']} - ({row['nama_pelanggan']})")), 
-                            DataCell(Text(row['tanggal_reservasi'])),
-                            DataCell(Text(row['waktu_reservasi'])),
-                            DataCell(Text(f"{row['jns_layanan']} - ({row['nama_layanan']})")),
-                            DataCell(Text(format_rupiah(row['harga_layanan']))),
+                            DataCell(Text(row['id_penjualan'])),
+                            DataCell(Text(row['tanggal'])),
+                            DataCell(Text(row['kasir'])),
+                            DataCell(Text(f"{row['id_pembeli']} - ({row['nama_pembeli']})")), 
+                            DataCell(Text(f"{row['id_sembako']} - ({row['nama_sembako']})")),
                             DataCell(
                             Row([
-                                IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_reservasi ),
-                                IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row, on_click = hapus_reservasi ),
+                                IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_penjualan ),
+                                IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row, on_click = hapus_penjualan ),
                             ])),
                         ]
                         )
                     )
 
         # fungsi menampilkan dialog form entri
-        def tampil_dialog_reservasi(e):
-            reservasi.inputan_id_reservasi.value = ''
-            reservasi.inputan_id_pelanggan.value = ''
-            reservasi.inputan_tanggal_reservasi.value = ''
-            reservasi.inputan_waktu_reservasi.value = ''
-            reservasi.inputan_jenis_layanan.value = ''
-            reservasi.dialog.open = True
-            reservasi.update()
+        def tampil_dialog_penjualan(e):
+            penjualan.inputan_id_penjualan.value = ''
+            penjualan.inputan_tanggal_penjualan.value = ''
+            penjualan.inputan_kasir.value = ''
+            penjualan.inputan_id_pembeli.value = ''
+            penjualan.inputan_id_sembako.value = ''
+            penjualan.dialog.open = True
+            penjualan.update()
 
-        def tampil_dialog_ubah_reservasi(e):
-            reservasi.inputan_id_reservasi.value = e.control.data['id_reservasi']
-            reservasi.inputan_id_pelanggan.value = e.control.data['id_pelanggan']
-            reservasi.inputan_tanggal_reservasi.value = e.control.data['tanggal_reservasi']
-            reservasi.inputan_waktu_reservasi.value = e.control.data['waktu_reservasi']
-            reservasi.inputan_jenis_layanan.value = e.control.data['jns_layanan']
-            reservasi.dialog.open = True
-            reservasi.update()
+        def tampil_dialog_ubah_penjualan(e):
+            penjualan.inputan_id_penjualan.value = e.control.data['id_penjualan']
+            penjualan.inputan_tanggal_penjualan.value = e.control.data['tanggal']
+            penjualan.inputan_kasir.value = e.control.data['kasir']
+            penjualan.inputan_id_pembeli.value = e.control.data['id_pembeli']
+            penjualan.inputan_id_sembako.value = e.control.data['id_sembako']
+            penjualan.dialog.open = True
+            penjualan.update()
 
 
         # fungsi simpan data
-        def simpan_reservasi(e):
+        def simpan_penjualan(e):
             try:
-                if (reservasi.inputan_id_reservasi.value == '') :
-                    sql = "INSERT INTO reservasi (id_reservasi, id_pelanggan, tanggal_reservasi, waktu_reservasi, jns_layanan) VALUES(%s, %s, %s, %s, %s)"
-                    val = (reservasi.inputan_id_reservasi.value, reservasi.inputan_id_pelanggan.value, reservasi.inputan_tanggal_reservasi.value, reservasi.inputan_waktu_reservasi.value, reservasi.inputan_jenis_layanan.value)
+                if (penjualan.inputan_id_penjualan.value == '') :
+                    sql = "INSERT INTO penjualan (id_penjualan, tanggal, kasir, id_pembeli , id_sembako) VALUES(%s, %s, %s, %s, %s)"
+                    val = (penjualan.inputan_id_penjualan.value, penjualan.inputan_tanggal_penjualan.value, penjualan.inputan_kasir.value, penjualan.inputan_id_pembeli.value, penjualan.inputan_id_sembako.value)
                 else :
-                    sql = "UPDATE reservasi SET id_pelanggan = %s, tanggal_reservasi = %s, waktu_reservasi = %s, jns_layanan = %s WHERE id_reservasi = %s"
-                    val = (reservasi.inputan_id_pelanggan.value, reservasi.inputan_tanggal_reservasi.value, reservasi.inputan_waktu_reservasi.value, reservasi.inputan_jenis_layanan.value, reservasi.inputan_id_reservasi.value)
+                    sql = "UPDATE penjualan SET tanggal = %s, kasir = %s, id_pembeli = %s, id_sembako = %s WHERE id_penjualan = %s"
+                    val = (penjualan.inputan_tanggal_penjualan.value, penjualan.inputan_kasir.value, penjualan.inputan_id_pembeli.value, penjualan.inputan_id_sembako.value, penjualan.inputan_id_penjualan.value)
                     
                 cursor.execute(sql, val)
                 koneksi_db.commit()
                 print(cursor.rowcount, "Data di simpan!")
 
-                tampil_reservasi(e)
-                reservasi.dialog.open = False
-                reservasi.snack_bar_berhasil.open = True
-                reservasi.update()
+                tampil_penjualan(e)
+                penjualan.dialog.open = False
+                penjualan.snack_bar_berhasil.open = True
+                penjualan.update()
             except Exception as e:
                 print(e)
                 print("Ada yang error!")
 
 
         # fungsi hapus data
-        def hapus_reservasi(e):
+        def hapus_penjualan(e):
             try:
-                sql = "DELETE FROM reservasi WHERE id_reservasi = %s"
-                val = (e.control.data['id_reservasi'],)
+                sql = "DELETE FROM penjualan WHERE id_penjualan = %s"
+                val = (e.control.data['id_penjualan'],)
                 cursor.execute(sql, val)
                 koneksi_db.commit()
                 print(cursor.rowcount, "data di hapus!")
-                reservasi.data_reservasi.rows.clear()
+                penjualan.data_penjualan.rows.clear()
                 
-                tampil_reservasi(e)
-                reservasi.dialog.open = False
-                reservasi.snack_bar_berhasil.open = True
-                reservasi.update()
+                tampil_penjualan(e)
+                penjualan.dialog.open = False
+                penjualan.snack_bar_berhasil.open = True
+                penjualan.update()
             except Exception as e:
                 print(e)
                 print("Ada yang error!")
 
         # menampilkan semua data ke dalam tabel
         cursor.execute("""
-            SELECT reservasi.id_reservasi, reservasi.id_pelanggan, membership.nama AS nama_pelanggan, 
-                reservasi.tanggal_reservasi, reservasi.waktu_reservasi, 
-                reservasi.jns_layanan, layanan.jns_layanan AS nama_layanan,
-                layanan.hrg_layanan AS harga_layanan
-            FROM reservasi
-            JOIN membership ON reservasi.id_pelanggan = membership.id
-            JOIN layanan ON reservasi.jns_layanan = layanan.id_layanan
+            SELECT penjualan.id_penjualan, penjualan.tanggal, penjualan.kasir, 
+                pembeli.id_pembeli, pembeli.nama_pembeli,
+                sembako.id_sembako, sembako.nama_sembako
+            FROM penjualan
+            JOIN pembeli ON penjualan.id_pembeli = pembeli.id_pembeli
+            JOIN sembako ON penjualan.id_sembako = sembako.id_sembako
         """)
         result = cursor.fetchall()
         columns = [column[0] for column in cursor.description]
         rows = [dict(zip(columns,row)) for row in result]
-        reservasi.data_reservasi = DataTable(
+        penjualan.data_penjualan = DataTable(
             columns = [
-                DataColumn(Text("ID Reservasi")),
-                DataColumn(Text("ID Pelanggan")),
-                DataColumn(Text("Tanggal Reservasi")),
-                DataColumn(Text("Waktu Reservasi")),
-                DataColumn(Text("Jenis Layanan")),
-                DataColumn(Text("Total Harga")),
+                DataColumn(Text("ID Penjualan")),
+                DataColumn(Text("Tanggal")),
+                DataColumn(Text("Kasir")),
+                DataColumn(Text("ID Pembeli")),
+                DataColumn(Text("ID Sembako")),
                 DataColumn(Text("Opsi")),
             ],
         )
         for row in rows:
-            reservasi.data_reservasi.rows.append(
+            penjualan.data_penjualan.rows.append(
                 DataRow(
                     cells = [
-                            DataCell(Text(row['id_reservasi'])),
-                            DataCell(Text(f"{row['id_pelanggan']} - ({row['nama_pelanggan']})")), 
-                            DataCell(Text(row['tanggal_reservasi'])),
-                            DataCell(Text(row['waktu_reservasi'])),
-                            DataCell(Text(f"{row['jns_layanan']} - ({row['nama_layanan']})")),
-                            DataCell(Text(format_rupiah(row['harga_layanan']))),
+                            DataCell(Text(row['id_penjualan'])),
+                            DataCell(Text(row['tanggal'])),
+                            DataCell(Text(row['kasir'])),
+                            DataCell(Text(f"{row['id_pembeli']} - ({row['id_sembako']})")), 
+                            DataCell(Text(f"{row['id_sembako']} - ({row['nama_sembako']})")),
                             DataCell(
                                 Row([
-                                    IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_reservasi ),
-                                    IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row, on_click = hapus_reservasi ),
+                                    IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_penjualan ),
+                                    IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row, on_click = hapus_penjualan ),
                                 ])
                                 ),
                     ]
@@ -423,20 +418,21 @@ class Reservasi(UserControl):
             )
 
         # buat variabel utk layout data rekapan
-        reservasi.layout_data = Column()
+        penjualan.layout_data = Column()
 
 
         # buat form dialog untuk form entri data
-        reservasi.dialog = BottomSheet(
+        penjualan.dialog = BottomSheet(
             Container(
                 Column(
                     [
-                        Text("Form Entri Data Reservasi", weight = FontWeight.BOLD),
-                        Row([ reservasi.inputan_id_reservasi ]),
-                        Row([ reservasi.inputan_id_pelanggan ]),
-                        Row([ reservasi.inputan_tanggal_reservasi, FloatingActionButton(icon=icons.CALENDAR_MONTH, on_click=lambda _: reservasi.opsi_tanggal.pick_date())  ]),
-                        Row([ reservasi.inputan_waktu_reservasi,FloatingActionButton(icon=icons.ACCESS_TIME, on_click=lambda _: reservasi.opsi_jam.pick_time()) ]),
-                        Row([ reservasi.inputan_jenis_layanan ]),
+                        Text("Form Entri Data Penjualan", weight = FontWeight.BOLD),
+                        Row([ penjualan.inputan_id_penjualan ]),
+                        Row([ penjualan.inputan_tanggal_penjualan, FloatingActionButton(icon=icons.CALENDAR_MONTH, on_click=lambda _: penjualan.opsi_tanggal.pick_date())  ]),
+                        Row([ penjualan.inputan_kasir ]),
+                        # Row([ penjualan.inputan_waktu_reservasi,FloatingActionButton(icon=icons.ACCESS_TIME, on_click=lambda _: reservasi.opsi_jam.pick_time()) ]),
+                        Row([ penjualan.inputan_id_pembeli ]),
+                        Row([ penjualan.inputan_id_sembako ]),
                         Row([
                             #tombol tambah data
                             ElevatedButton(
@@ -447,7 +443,7 @@ class Reservasi(UserControl):
                                     bgcolor = "blue",
                                     width =  250,
                                     height = 50,
-                                    on_click = simpan_reservasi,
+                                    on_click = simpan_penjualan,
                                 )
                         ]),
                     ],
@@ -468,11 +464,11 @@ class Reservasi(UserControl):
 
 
    # buat variabel tampilan layout utama
-        reservasi.layout_utama = Column(
+        penjualan.layout_utama = Column(
             [
                 Container(
                     Text(
-                        "Rekap Data Reservasi",
+                        "Rekap Data Penjualan",
                         size = 23,
                         # color = "white",
                         weight = FontWeight.BOLD,
@@ -488,24 +484,24 @@ class Reservasi(UserControl):
                         color = "white",
                         bgcolor = "blue",
                         width = 200,
-                        on_click = tampil_dialog_reservasi,
+                        on_click = tampil_dialog_penjualan,
                     ),
                     alignment = alignment.center,
                     padding = 10,
                 ),
 
                 Row(
-                    [reservasi.data_reservasi], scroll=ScrollMode.ALWAYS
+                    [penjualan.data_penjualan], scroll=ScrollMode.ALWAYS
                 ),
-                reservasi.layout_data,
-                reservasi.opsi_tanggal,
-                reservasi.opsi_jam,
-                reservasi.snack_bar_berhasil,
-                reservasi.dialog,
+                penjualan.layout_data,
+                penjualan.opsi_tanggal,
+                # penjualan.opsi_jam,
+                penjualan.snack_bar_berhasil,
+                penjualan.dialog,
             ]
         )
 
-        return reservasi.layout_utama
+        return penjualan.layout_utama
 
 
 class FormPembeli(UserControl):
@@ -755,7 +751,7 @@ def main (page : Page):
                             # Icon(name = icons.CAST_FOR_EDUCATION, color = colors.BLUE, size = 180),
                             Column(
                                 controls = [
-                                    ElevatedButton("Menu Reservasi", icon = icons.TABLE_ROWS, on_click = lambda _: page.go("/reservasi"), width=205),
+                                    ElevatedButton("Menu Penjualan", icon = icons.TABLE_ROWS, on_click = lambda _: page.go("/penjualan"), width=205),
                                     ElevatedButton("Menu Sembako", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/sembako"), width=205 ),
                                     ElevatedButton("Menu Pembeli", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/pembeli"), width=205 ),
                                     ElevatedButton("Menu Jadwal Kuliah", icon = icons.SCHEDULE_ROUNDED, on_click = lambda _: page.go("/jadwalkuliah"), disabled=True, width=205, visible=False ),
@@ -796,12 +792,12 @@ def main (page : Page):
                     ],
                 )
             )
-        if page.route == "/reservasi":
+        if page.route == "/penjualan":
             page.views.append(
-                View("/reservasi",
+                View("/penjualan",
                     [
-                        AppBar(title = Text("Menu Reservasi", size = 14, weight = FontWeight.BOLD), bgcolor = colors.SURFACE_VARIANT ),
-                        Reservasi()
+                        AppBar(title = Text("Menu Penjualan", size = 14, weight = FontWeight.BOLD), bgcolor = colors.SURFACE_VARIANT ),
+                        FormPenjualan()
                     ],
                 )
             )
