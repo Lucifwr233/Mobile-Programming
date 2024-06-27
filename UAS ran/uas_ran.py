@@ -187,6 +187,42 @@ class FormSembako(UserControl):
             #on_dismiss=bs_dismissed,
         )
 
+        # Fungsi untuk mencari data berdasarkan input pengguna
+        def inputsearch(e):
+            query = sembako.inputan_cari.value.lower()
+            sembako.data_sembako.rows.clear()
+            cursor.execute("SELECT * FROM sembako ORDER BY id_sembako DESC")
+            result = cursor.fetchall()
+            columns = [column[0] for column in cursor.description]
+            rows = [dict(zip(columns, row)) for row in result]
+            for row in rows:
+                if query in row['nama_sembako'].lower():
+                    sembako.data_sembako.rows.append(
+                        DataRow(
+                            cells=[
+                                DataCell(Text(row['id_sembako'])),
+                                DataCell(Text(row['nama_sembako'])),
+                                DataCell(Text(format_rupiah(row['harga']))),
+                                DataCell(Text(row['quantity'])),
+                                DataCell(Text(row['satuan'])),
+                                DataCell(
+                                    Row([
+                                        IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_sembako),
+                                        IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row, on_click = hapus_sembako ),
+                                    ])
+                                ),
+                            ]
+                        )
+                    )
+            sembako.update()
+
+        sembako.inputan_cari = TextField(
+            label="Cari Data",
+            hint_text="Masukkan Nama Sembako",
+            expand=True,
+            on_change=inputsearch
+        )
+
    # buat variabel tampilan layout utama
         sembako.layout_utama = Column(
             [
@@ -199,6 +235,9 @@ class FormSembako(UserControl):
                     ),
                     alignment = alignment.center,
                     padding = 30,
+                ),
+                Container(
+                    sembako.inputan_cari,
                 ),
                 Container(
                     ElevatedButton(
@@ -463,6 +502,50 @@ class FormPenjualan(UserControl):
         )
 
 
+        # Fungsi untuk mencari data berdasarkan input pengguna
+        def inputsearch(e):
+            query = penjualan.inputan_cari.value.lower()
+            penjualan.data_penjualan.rows.clear()
+            cursor.execute("""
+                SELECT penjualan.id_penjualan, penjualan.tanggal, penjualan.kasir, 
+                    pembeli.id_pembeli, pembeli.nama_pembeli,
+                    sembako.id_sembako, sembako.nama_sembako
+                FROM penjualan
+                JOIN pembeli ON penjualan.id_pembeli = pembeli.id_pembeli
+                JOIN sembako ON penjualan.id_sembako = sembako.id_sembako
+            """)
+            result = cursor.fetchall()
+            columns = [column[0] for column in cursor.description]
+            rows = [dict(zip(columns, row)) for row in result]
+            for row in rows:
+                if query in row['kasir'].lower():
+                    penjualan.data_penjualan.rows.append(
+                        DataRow(
+                            cells=[
+                                DataCell(Text(row['id_penjualan'])),
+                                DataCell(Text(row['tanggal'])),
+                                DataCell(Text(row['kasir'])),
+                                DataCell(Text(f"{row['id_pembeli']} - ({row['nama_pembeli']})")), 
+                                DataCell(Text(f"{row['id_sembako']} - ({row['nama_sembako']})")),
+                                DataCell(
+                                    Row([
+                                        IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_penjualan ),
+                                        IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row, on_click = hapus_penjualan ),
+                                    ])
+                                ),
+                            ]
+                        )
+                    )
+            penjualan.update()
+
+        penjualan.inputan_cari = TextField(
+            label="Cari Data",
+            hint_text="Masukkan Nama Kasir",
+            expand=True,
+            on_change=inputsearch
+        )
+
+
    # buat variabel tampilan layout utama
         penjualan.layout_utama = Column(
             [
@@ -475,6 +558,9 @@ class FormPenjualan(UserControl):
                     ),
                     alignment = alignment.center,
                     padding = 30,
+                ),
+                Container(
+                    penjualan.inputan_cari,
                 ),
                 Container(
                     ElevatedButton(
@@ -677,6 +763,41 @@ class FormPembeli(UserControl):
             #on_dismiss=bs_dismissed,
         )
 
+        # Fungsi untuk mencari data berdasarkan input pengguna
+        def inputsearch(e):
+            query = pembeli.inputan_cari.value.lower()
+            pembeli.data_pembeli.rows.clear()
+            cursor.execute("SELECT * FROM pembeli ORDER BY id_pembeli DESC")
+            result = cursor.fetchall()
+            columns = [column[0] for column in cursor.description]
+            rows = [dict(zip(columns, row)) for row in result]
+            for row in rows:
+                if query in row['nama_pembeli'].lower():
+                    pembeli.data_pembeli.rows.append(
+                        DataRow(
+                            cells=[
+                                DataCell(Text(row['id_pembeli'])),
+                                DataCell(Text(row['nama_pembeli'])),
+                                DataCell(Text(row['jk_pembeli'])),
+                                DataCell(Text(row['alamat'])),
+                                DataCell(
+                                    Row([
+                                        IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_pembeli),
+                                        IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row, on_click = hapus_pembeli ),
+                                    ])
+                                ),
+                            ]
+                        )
+                    )
+            pembeli.update()
+
+        pembeli.inputan_cari = TextField(
+            label="Cari Data",
+            hint_text="Masukkan Nama Pembeli",
+            expand=True,
+            on_change=inputsearch
+        )
+
    # buat variabel tampilan layout utama
         pembeli.layout_utama = Column(
             [
@@ -689,6 +810,9 @@ class FormPembeli(UserControl):
                     ),
                     alignment = alignment.center,
                     padding = 30,
+                ),
+                Container(
+                    pembeli.inputan_cari,
                 ),
                 Container(
                     ElevatedButton(
