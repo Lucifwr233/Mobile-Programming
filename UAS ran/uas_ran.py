@@ -12,12 +12,14 @@ cursor = koneksi_db.cursor()
 class FormSembako(UserControl):
     # class untuk halaman mata kuliah
     def build(sembako) :
+        def format_rupiah(angka):
+            return f"Rp {angka:,.0f}".replace(',', '.')
         # buat variabel inputan
         sembako.inputan_id_sembako = TextField(visible = False, expand = True)
         sembako.inputan_nama_sembako = TextField(label = "Nama Sembako", hint_text = "Nama Sembako", expand = True)
         sembako.inputan_harga = TextField(label = "Harga", hint_text = "Harga", expand = True)
         sembako.inputan_quantity = TextField(label = "Quantity", hint_text = "Quantity", expand = True)
-        member.inputan_satuan = Dropdown(label = "Satuan", hint_text = "Satuan", expand = True, options=[dropdown.Option("Kg"), dropdown.Option("Ltr")],)
+        sembako.inputan_satuan = Dropdown(label = "Satuan", hint_text = "Satuan", expand = True, options=[dropdown.Option("Kg"), dropdown.Option("L")],)
         sembako.snack_bar_berhasil = SnackBar( Text("Operasi berhasil"), bgcolor="green")
 
         # memuat tabel data
@@ -35,7 +37,7 @@ class FormSembako(UserControl):
                         cells = [
                             DataCell(Text(row['id_sembako'])),
                             DataCell(Text(row['nama_sembako'])),
-                            DataCell(Text(row['harga'])),
+                            DataCell(Text(format_rupiah(row['harga']))),
                             DataCell(Text(row['quantity'])),
                             DataCell(Text(row['satuan'])),
                             DataCell(
@@ -71,10 +73,10 @@ class FormSembako(UserControl):
         def simpan_sembako(e):
             try:
                 if (sembako.inputan_id_sembako.value == '') :
-                    sql = "INSERT INTO membership (id_sembako, nama_sembako, harga, quantity, satuan) VALUES(%s, %s, %s, %s, %s)"
+                    sql = "INSERT INTO sembako (id_sembako, nama_sembako, harga, quantity, satuan) VALUES(%s, %s, %s, %s, %s)"
                     val = (sembako.inputan_id_sembako.value, sembako.inputan_nama_sembako.value, sembako.inputan_harga.value, sembako.inputan_quantity.value, sembako.inputan_satuan.value)
                 else :
-                    sql = "UPDATE membership SET nama_sembako = %s, harga = %s, quantity = %s, satuan = %s, WHERE id_sembako = %s"
+                    sql = "UPDATE sembako SET nama_sembako = %s, harga = %s, quantity = %s, satuan = %s WHERE id_sembako= %s"
                     val = (sembako.inputan_nama_sembako.value, sembako.inputan_harga.value, sembako.inputan_quantity.value, sembako.inputan_satuan.value, sembako.inputan_id_sembako.value)
                     
                 cursor.execute(sql, val)
@@ -109,37 +111,33 @@ class FormSembako(UserControl):
                 print("Ada yang error!")
 
         # menampilkan semua data ke dalam tabel
-        cursor.execute("SELECT * FROM membership")
+        cursor.execute("SELECT * FROM sembako")
         result = cursor.fetchall()
         columns = [column[0] for column in cursor.description]
         rows = [dict(zip(columns,row)) for row in result]
-        member.data_member = DataTable(
+        sembako.data_sembako = DataTable(
             columns = [
-                DataColumn(Text("ID")),
-                DataColumn(Text("Nama")),
-                DataColumn(Text("Jenis Kelamin")),
-                DataColumn(Text("Tgl Lahir")),
-                DataColumn(Text("Alamat")),
-                DataColumn(Text("Telp")),
-                DataColumn(Text("Tgl Member")),
+                DataColumn(Text("ID Sembako")),
+                DataColumn(Text("Nama Sembako")),
+                DataColumn(Text("Harga")),
+                DataColumn(Text("Quantity")),
+                DataColumn(Text("Satuan")),
                 DataColumn(Text("Opsi")),
             ],
         )
         for row in rows:
-            member.data_member.rows.append(
+            sembako.data_sembako.rows.append(
                 DataRow(
                     cells = [
-                            DataCell(Text(row['id'])),
-                            DataCell(Text(row['nama'])),
-                            DataCell(Text(row['jekel'])),
-                            DataCell(Text(row['tgl_lahir'])),
-                            DataCell(Text(row['alamat'])),
-                            DataCell(Text(row['telp'])),
-                            DataCell(Text(row['tgl_member'])),
+                            DataCell(Text(row['id_sembako'])),
+                            DataCell(Text(row['nama_sembako'])),
+                            DataCell(Text(format_rupiah(row['harga']))),
+                            DataCell(Text(row['quantity'])),
+                            DataCell(Text(row['satuan'])),
                         DataCell(
                             Row([
-                                IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_member),
-                                IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row, on_click = hapus_member ),
+                                IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_sembako),
+                                IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row, on_click = hapus_sembako ),
                             ])
                         ),
                     ]
@@ -147,21 +145,19 @@ class FormSembako(UserControl):
             )
 
         # buat variabel utk layout data rekapan
-        member.layout_data = Column()
+        sembako.layout_data = Column()
 
         # buat form dialog untuk form entri data
-        member.dialog = BottomSheet(
+        sembako.dialog = BottomSheet(
             Container(
                 Column(
                     [
-                        Text("Form Entri Data Member", weight = FontWeight.BOLD),
-                        Row([ member.inputan_id ]),
-                        Row([ member.inputan_nama ]),
-                        Row([ member.inputan_jekel ]),
-                        Row([ member.inputan_alamat ]),
-                        Row([ member.inputan_tgl_lahir, FloatingActionButton(icon=icons.CALENDAR_MONTH, on_click=lambda _: member.opsi_tanggal.pick_date())  ]),
-                        Row([ member.inputan_telp ]),
-                        Row([ member.inputan_tgl_member, FloatingActionButton(icon=icons.CALENDAR_MONTH, on_click=lambda _: member.opsi_tanggal_member.pick_date()) ]),
+                        Text("Form Entri Data Sembako", weight = FontWeight.BOLD),
+                        Row([ sembako.inputan_id_sembako ]),
+                        Row([ sembako.inputan_nama_sembako ]),
+                        Row([ sembako.inputan_harga ]),
+                        Row([ sembako.inputan_quantity ]),
+                        Row([ sembako.inputan_satuan ]),
                         Row([
                             #tombol tambah data
                             ElevatedButton(
@@ -172,7 +168,7 @@ class FormSembako(UserControl):
                                     bgcolor = "blue",
                                     width =  250,
                                     height = 50,
-                                    on_click = simpan_member,
+                                    on_click = simpan_sembako,
                                 )
                         ]),
                     ],
@@ -192,11 +188,11 @@ class FormSembako(UserControl):
         )
 
    # buat variabel tampilan layout utama
-        member.layout_utama = Column(
+        sembako.layout_utama = Column(
             [
                 Container(
                     Text(
-                        "Rekap Data Member",
+                        "Rekap Data Sembako",
                         size = 25,
                         # color = "white",
                         weight = FontWeight.BOLD,
@@ -212,23 +208,21 @@ class FormSembako(UserControl):
                         color = "white",
                         bgcolor = "blue",
                         width = 200,
-                        on_click = tampil_dialog_member,
+                        on_click = tampil_dialog_sembako,
                     ),
                     alignment = alignment.center,
                     padding = 10,
                 ),
                 Row(
-                    [member.data_member], scroll=ScrollMode.ALWAYS
+                    [sembako.data_sembako], scroll=ScrollMode.ALWAYS
                 ),
-                member.layout_data,
-                member.snack_bar_berhasil,
-                member.dialog,
-                member.opsi_tanggal,
-                member.opsi_tanggal_member
+                sembako.layout_data,
+                sembako.snack_bar_berhasil,
+                sembako.dialog,
             ]
         )
 
-        return member.layout_utama
+        return sembako.layout_utama
 
 
 class Reservasi(UserControl):
@@ -762,7 +756,7 @@ def main (page : Page):
                             Column(
                                 controls = [
                                     ElevatedButton("Menu Reservasi", icon = icons.TABLE_ROWS, on_click = lambda _: page.go("/reservasi"), width=205),
-                                    ElevatedButton("Menu Membership", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/member"), width=205 ),
+                                    ElevatedButton("Menu Sembako", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/sembako"), width=205 ),
                                     ElevatedButton("Menu Pembeli", icon = icons.PEOPLE_ROUNDED, on_click = lambda _: page.go("/pembeli"), width=205 ),
                                     ElevatedButton("Menu Jadwal Kuliah", icon = icons.SCHEDULE_ROUNDED, on_click = lambda _: page.go("/jadwalkuliah"), disabled=True, width=205, visible=False ),
                                 ],
@@ -785,7 +779,7 @@ def main (page : Page):
                                 width = 375,
                                 horizontal_alignment = CrossAxisAlignment.CENTER,
                             ),
-                            Text('Mobile Programming - Fattah Barbershop @2024', size = 12)
+                            Text('Mobile Programming - Sembako @2024', size = 12)
                         ],
                         horizontal_alignment = CrossAxisAlignment.CENTER,
                     ),
@@ -793,12 +787,12 @@ def main (page : Page):
                 ],
             )
         )
-        if page.route == "/member":
+        if page.route == "/sembako":
             page.views.append(
-                View("/member",
+                View("/sembako",
                     [
-                        AppBar(title = Text("Menu Membership", size = 14, weight = FontWeight.BOLD), bgcolor = colors.SURFACE_VARIANT ),
-                        FormMember()
+                        AppBar(title = Text("Menu Sembako", size = 14, weight = FontWeight.BOLD), bgcolor = colors.SURFACE_VARIANT ),
+                        FormSembako()
                     ],
                 )
             )
