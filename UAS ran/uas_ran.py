@@ -591,8 +591,8 @@ class FormPembeli(UserControl):
                             DataCell(Text(row['alamat'])),
                             DataCell(
                                 Row([
-                                    IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click=tampil_dialog_ubah_layanan ),
-                                    IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row, on_click=hapus_layanan ),
+                                    IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click=tampil_dialog_ubah_pembeli ),
+                                    IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row, on_click=hapus_pembeli ),
                                 ])
                             ),
                         ]
@@ -600,85 +600,89 @@ class FormPembeli(UserControl):
                     )
 
         # fungsi menampilkan dialog form entri
-        def tampil_dialog_layanan(e):
-            layanan.inputan_id_layanan.value = ''
-            layanan.inputan_jenis_layanan.value = ''
-            layanan.inputan_harga_layanan.value = ''
-            layanan.dialog.open = True
-            layanan.update()
+        def tampil_dialog_pembeli(e):
+            pembeli.inputan_id_pembeli.value = ''
+            pembeli.inputan_nama_pembeli.value = ''
+            pembeli.inputan_jk_pembeli.value = ''
+            pembeli.inputan_alamat.value = ''
+            pembeli.dialog.open = True
+            pembeli.update()
 
-        def tampil_dialog_ubah_layanan(e):
-            layanan.inputan_id_layanan.value = e.control.data['id_layanan']
-            layanan.inputan_jenis_layanan.value = e.control.data['jns_layanan']
-            layanan.inputan_harga_layanan.value = e.control.data['hrg_layanan']
-            layanan.dialog.open = True
-            layanan.update()
+        def tampil_dialog_ubah_pembeli(e):
+            pembeli.inputan_id_pembeli.value = e.control.data['id_pembeli']
+            pembeli.inputan_nama_pembeli.value = e.control.data['nama_pembeli']
+            pembeli.inputan_jk_pembeli.value = e.control.data['jk_pembeli']
+            pembeli.inputan_alamat.value = e.control.data['alamat']
+            pembeli.dialog.open = True
+            pembeli.update()
 
         # fungsi simpan data
-        def simpan_layanan(e):
+        def simpan_pembeli(e):
             try:
-                if (layanan.inputan_id_layanan.value == '') :
-                    sql = "INSERT INTO layanan (id_layanan, jns_layanan, hrg_layanan ) VALUES(%s, %s, %s)"
-                    val = (layanan.inputan_id_layanan.value, layanan.inputan_jenis_layanan.value, layanan.inputan_harga_layanan.value)
+                if (pembeli.inputan_id_pembeli.value == '') :
+                    sql = "INSERT INTO pembeli (id_pembeli, nama_pembeli, jk_pembeli, alamat ) VALUES(%s, %s, %s, %s)"
+                    val = (pembeli.inputan_id_pembeli.value, pembeli.inputan_nama_pembeli.value, pembeli.inputan_jk_pembeli.value, pembeli.inputan_alamat.value)
                 else :
-                    sql = "UPDATE layanan SET jns_layanan = %s, hrg_layanan = %s WHERE id_layanan = %s"
-                    val = (layanan.inputan_jenis_layanan.value, layanan.inputan_harga_layanan.value, layanan.inputan_id_layanan.value)
+                    sql = "UPDATE pembeli SET nama_pembeli = %s, jk_pembeli = %s, alamat = %s WHERE id_pembeli = %s"
+                    val = (pembeli.inputan_nama_pembeli.value, pembeli.inputan_jk_pembeli.value, pembeli.inputan_alamat.value, pembeli.inputan_id_pembeli.value)
                     
                 cursor.execute(sql, val)
                 koneksi_db.commit()
                 print(cursor.rowcount, "Data di simpan!")
 
-                tampil_layanan(e)
-                layanan.dialog.open = False
-                layanan.snack_bar_berhasil.open = True
-                layanan.update()
+                tampil_pembeli(e)
+                pembeli.dialog.open = False
+                pembeli.snack_bar_berhasil.open = True
+                pembeli.update()
             except Exception as e:
                 print(e)
                 print("Ada yang error!")
 
 
         # fungsi hapus data
-        def hapus_layanan(e):
+        def hapus_pembeli(e):
             try:
-                sql = "DELETE FROM layanan WHERE id_layanan = %s"
-                val = (e.control.data['id_layanan'],)
+                sql = "DELETE FROM pembeli WHERE id_pembeli = %s"
+                val = (e.control.data['id_pembeli'],)
                 cursor.execute(sql, val)
                 koneksi_db.commit()
                 print(cursor.rowcount, "data di hapus!")
-                layanan.data_layanan.rows.clear()
+                pembeli.data_pembeli.rows.clear()
                 
-                tampil_layanan(e)
-                layanan.dialog.open = False
-                layanan.snack_bar_berhasil.open = True
-                layanan.update()
+                tampil_pembeli(e)
+                pembeli.dialog.open = False
+                pembeli.snack_bar_berhasil.open = True
+                pembeli.update()
             except Exception as e:
                 print(e)
                 print("Ada yang error!")
 
         # menampilkan semua data ke dalam tabel
-        cursor.execute("SELECT * FROM layanan")
+        cursor.execute("SELECT * FROM pembeli")
         result = cursor.fetchall()
         columns = [column[0] for column in cursor.description]
         rows = [dict(zip(columns,row)) for row in result]
-        layanan.data_layanan = DataTable(
+        pembeli.data_pembeli = DataTable(
             columns = [
-                DataColumn(Text("ID Layanan")),
-                DataColumn(Text("Jenis Layanan")),
-                DataColumn(Text("Harga Layanan")),
+                DataColumn(Text("ID Pembeli")),
+                DataColumn(Text("Nama Pembeli")),
+                DataColumn(Text("JK Pembeli")),
+                DataColumn(Text("Alamat")),
                 DataColumn(Text("Opsi")),
             ],
         )
         for row in rows:
-            layanan.data_layanan.rows.append(
+            pembeli.data_pembeli.rows.append(
                 DataRow(
                     cells = [
-                            DataCell(Text(row['id_layanan'])),
-                            DataCell(Text(row['jns_layanan'])),
-                            DataCell(Text(format_rupiah(row['hrg_layanan']))),
+                            DataCell(Text(row['id_pembeli'])),
+                            DataCell(Text(row['nama_pembeli'])),
+                            DataCell(Text(row['jk_pembeli'])),
+                            DataCell(Text(row['alamat'])),
                         DataCell(
                             Row([
-                                IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_layanan),
-                                IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row, on_click = hapus_layanan ),
+                                IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_pembeli),
+                                IconButton("DELETE_OUTLINE_OUTLINED", icon_color = "red", data = row, on_click = hapus_pembeli ),
                             ])
                         ),
                     ]
