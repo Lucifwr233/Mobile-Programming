@@ -343,8 +343,8 @@ class FormPenjualan(UserControl):
                             DataCell(Text(row['id_penjualan'])),
                             DataCell(Text(row['tanggal'])),
                             DataCell(Text(row['kasir'])),
-                            DataCell(Text(f"{row['id_pembeli']} - ({row['nama_pembeli']})")), 
-                            DataCell(Text(f"{row['id_sembako']} - ({row['nama_sembako']})")),
+                            DataCell(Text(f"({row['nama_pembeli']})")), 
+                            DataCell(Text(f"({row['nama_sembako']})")),
                             DataCell(
                             Row([
                                 IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_penjualan ),
@@ -444,8 +444,8 @@ class FormPenjualan(UserControl):
                             DataCell(Text(row['id_penjualan'])),
                             DataCell(Text(row['tanggal'])),
                             DataCell(Text(row['kasir'])),
-                            DataCell(Text(f"{row['id_pembeli']} - ({row['nama_pembeli']})")), 
-                            DataCell(Text(f"{row['id_sembako']} - ({row['nama_sembako']})")),
+                            DataCell(Text(f"{row['nama_pembeli']}")), 
+                            DataCell(Text(f"{row['nama_sembako']}")),
                             DataCell(
                                 Row([
                                     IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_penjualan ),
@@ -525,8 +525,8 @@ class FormPenjualan(UserControl):
                                 DataCell(Text(row['id_penjualan'])),
                                 DataCell(Text(row['tanggal'])),
                                 DataCell(Text(row['kasir'])),
-                                DataCell(Text(f"{row['id_pembeli']} - ({row['nama_pembeli']})")), 
-                                DataCell(Text(f"{row['id_sembako']} - ({row['nama_sembako']})")),
+                                DataCell(Text(f"{row['nama_pembeli']}")), 
+                                DataCell(Text(f"{row['nama_sembako']}")),
                                 DataCell(
                                     Row([
                                         IconButton("EDIT_OUTLINED", icon_color = "grey", data = row, on_click = tampil_dialog_ubah_penjualan ),
