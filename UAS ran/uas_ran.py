@@ -337,11 +337,13 @@ class FormPenjualan(UserControl):
             columns = [column[0] for column in cursor.description]
             rows = [dict(zip(columns,row)) for row in result]
             for row in rows:
+                original_date = row['tanggal']
+                formatted_date = original_date.strftime('%Y-%m-%d')
                 penjualan.data_penjualan.rows.append(
                     DataRow(
                         cells = [
                             DataCell(Text(row['id_penjualan'])),
-                            DataCell(Text(row['tanggal'])),
+                            DataCell(Text(formatted_date)),
                             DataCell(Text(row['kasir'])),
                             DataCell(Text(f"({row['nama_pembeli']})")), 
                             DataCell(Text(f"({row['nama_sembako']})")),
@@ -438,11 +440,14 @@ class FormPenjualan(UserControl):
             ],
         )
         for row in rows:
+                    # Reformat the date from DD-MM-YYYY to YYYY-MM-DD
+            original_date = row['tanggal']
+            formatted_date = original_date.strftime('%Y-%m-%d')
             penjualan.data_penjualan.rows.append(
                 DataRow(
                     cells = [
                             DataCell(Text(row['id_penjualan'])),
-                            DataCell(Text(row['tanggal'])),
+                            DataCell(Text(formatted_date)),
                             DataCell(Text(row['kasir'])),
                             DataCell(Text(f"{row['nama_pembeli']}")), 
                             DataCell(Text(f"{row['nama_sembako']}")),
