@@ -11,6 +11,7 @@ cursor = koneksi_db.cursor()
 
 class FormDurasiSewa(UserControl):
     def build(durasisewa) :
+        
 
         # buat variabel inputan
         durasisewa.inputan_id_durasi = TextField(visible = False, expand = True)
