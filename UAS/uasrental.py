@@ -23,6 +23,7 @@ class FormDurasiSewa(UserControl):
             # Merefresh halaman & menampilkan notif
             durasisewa.data_durasisewa.rows.clear()
             cursor.execute("SELECT * FROM durasi_sewa ORDER BY id_durasi DESC")
+            
             result = cursor.fetchall()
             # menampilkan ulang data 
             columns = [column[0] for column in cursor.description]
